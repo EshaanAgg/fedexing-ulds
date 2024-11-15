@@ -1,7 +1,9 @@
 import pandas as pd
+from typing import Optional
 from itertools import permutations
 
 
+# Checks if the provided intervals [l1, r1] and [l2, r2] intersect
 def interval_intersection(l1: int, r1: int, l2: int, r2: int) -> bool:
     return not (r1 <= l2 or r2 <= l1)
 
@@ -21,15 +23,15 @@ class Cuboid:
         self.y2 = y2
         self.z2 = z2
 
-        self.length = abs(x2 - x1)
-        self.width = abs(y2 - y1)
-        self.height = abs(z2 - z1)
+        self.length = x2 - x1
+        self.width = y2 - y1
+        self.height = z2 - z1
 
     def volume(self) -> int:
         return self.length * self.width * self.height
 
     # Returns the intersection of two cuboids, or None if they don't intersect
-    def intersection(self, other: "Cuboid") -> "Cuboid":
+    def intersection(self, other: "Cuboid") -> Optional["Cuboid"]:
         x1 = max(self.x1, other.x1)
         y1 = max(self.y1, other.y1)
         z1 = max(self.z1, other.z1)
@@ -46,13 +48,16 @@ class Cuboid:
     def intersects(self, other: "Cuboid") -> bool:
         return self.intersection(other) is not None
 
-    # Assumes that other is a cuboid placed at the origin
+    # Returns True if this cuboid is contained in the other cuboid
     def contained_in(self, other: "Cuboid") -> bool:
-        assert other.x1 == 0, f"The x1 of the other cuboid must be 0, got {other.x1}"
-        assert other.y1 == 0, f"The y1 of the other cuboid must be 0, got {other.y1}"
-        assert other.z1 == 0, f"The z1 of the other cuboid must be 0, got {other.z1}"
-
-        return self.x2 <= other.x2 and self.y2 <= other.y2 and self.z2 <= other.z2
+        return (
+            self.x2 <= other.x2
+            and self.y2 <= other.y2
+            and self.z2 <= other.z2
+            and self.x1 >= other.x1
+            and self.y1 >= other.y1
+            and self.z1 >= other.z1
+        )
 
     # Checks if this cuboid is on top of other
     def on_top_of(self, other: "Cuboid") -> bool:
@@ -73,6 +78,9 @@ class Package(Cuboid):
     def __repr__(self):
         return f"Package({self.x1}, {self.y1}, {self.z1}, {self.x2}, {self.y2}, {self.z2}, {self.weight})"
 
+    # Validates that the package is a valid rotation of the package in the package_data
+    # and sets the weight and score of the package
+    # Throws a ValueError if the package is not valid
     def validate_against_package(self, package_data: pd.DataFrame, package_id: int):
         package = package_data.loc[package_id == package_data["id"]].iloc[0]
 
@@ -116,6 +124,8 @@ class ULD(Cuboid):
         self.containing_packages.append(package)
         self.score += package.score
 
+    # Validates that the ULD is valid
+    # Throws a ValueError if the ULD is invalid
     def validate(self):
         # Weight validation
         total_weight = sum(package.weight for package in self.containing_packages)
@@ -153,6 +163,7 @@ class ULD(Cuboid):
                 )
 
 
+# Validates the solution given the ULD, packages, and solution CSV files
 def validate_solution(uld_path: str, packages_path: str, solution_path: str):
     uld_df = pd.read_csv(uld_path)
 
