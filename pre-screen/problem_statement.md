@@ -18,7 +18,7 @@ The packages have been generated such that it is not possible to pack all the pa
     Package_ID,ULD_ID,x0,y0,z0,x1,y1,z1
     ```
 
-    The convention that is to be followed is the same is described in the official problem statement. We will be using our own evaluation script to evaluate the output file, and if any of the convetions are not followed, the submission will be rejected.
+    The convention for the coordinates of the packages is the same as described in the official problem statement. Please note that you need to add the above lines for only the packages that you are shipping, and not all the packages (as described in the official problem statement). We will be using our own evaluation script to evaluate the output file, and if any of the convetions are not followed, the submission will be rejected.
 
 - The code can be written in any language. You would need to submit the code and the output file in a zip file.
 - The output file should be named as `output.csv`.
@@ -26,4 +26,4 @@ The packages have been generated such that it is not possible to pack all the pa
 
 ## Submission Deadline
 
-The deadline for submission is `11:59 AM` on `16 October 2024`. The deadline is not flexible and no submissions will be accepted after the deadline. We will be sharing the submission form on the WhatsApp group, where you can submit your solution.
+The deadline for submission is `11:59 AM` on `16 November 2024, Saturday`. The deadline is not flexible and no submissions will be accepted after the deadline. We will be sharing the submission form on the WhatsApp group, where you can submit your solution.

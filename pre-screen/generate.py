@@ -13,15 +13,15 @@ if __name__ == "__main__":
     for id in range(1, NUMBER_PACKAGES + 1):
         package = {
             "id": id,
-            "height": random.randint(*DIM_LIM),
+            "length": random.randint(*DIM_LIM),
             "width": random.randint(*DIM_LIM),
-            "depth": random.randint(*DIM_LIM),
+            "height": random.randint(*DIM_LIM),
             "weight": random.randint(*WT_LIM),
             "score": random.randint(100, 500),
         }
         packages.append(package)
 
-        total_volume += package["height"] * package["width"] * package["depth"]
+        total_volume += package["length"] * package["width"] * package["height"]
         total_weight += package["weight"]
 
     with open("packages.csv", "w", newline="") as file:
