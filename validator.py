@@ -258,7 +258,7 @@ def validate_solution(
 
     for uld in ulds:
         try:
-            uld.validate()
+            uld.validate(use_spatial_validation)
         except ValueError as e:
             print(f"ULD {uld.id} is invalid: {e}")
 
