@@ -1,2 +1,4 @@
 pre-screen/*.csv
 pre-screen/*.zip
+
+*.csv

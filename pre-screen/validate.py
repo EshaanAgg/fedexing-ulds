@@ -194,6 +194,13 @@ def validate_solution(uld_path: str, packages_path: str, solution_path: str):
             skiprows=2,
             names=["package_id", "uld_id", "x1", "y1", "z1", "x2", "y2", "z2"],
         )
+
+        # If any ULD ID or package ID is None, remove the row
+        # and log a warning
+        if solution_data.isnull().values.any():
+            print("Warning: Some ULD ID or package ID is None")
+            solution_data = solution_data.dropna(subset=["package_id", "uld_id"])
+
         assert solution_data.shape[0] == number_packages, (
             f"Number of packages in solution does not match expected number, "
             f"got {solution_data.shape[0]} and {number_packages}"
@@ -239,4 +246,8 @@ def validate_solution(uld_path: str, packages_path: str, solution_path: str):
 
 
 if __name__ == "__main__":
-    validate_solution("./uld.csv", "./packages.csv", "./sample_solution.csv")
+    validate_solution(
+        "./uld.csv",
+        "./packages.csv",
+        "./solution.csv",
+    )

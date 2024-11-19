@@ -22,6 +22,7 @@ The packages have been generated such that it is not possible to pack all the pa
     The convention for the coordinates of the packages is the same as described in the official problem statement. Please note that you need to add the above lines for only the packages that you are shipping, and not all the packages (as described in the official problem statement). We will be using our own evaluation script to evaluate the output file, and if any of the convetions are not followed, the submission will be rejected.
 
 - You do NOT need to consider the spatial and geometric stability of the proposed packing in your solution. However some basic constraints like the package should fit inside the ULD, and each package should either be resting on the ground or be supported on the bottom by some other package should be followed.
+- The packages CAN be rotated in any orientation to fit into the ULDs.
 - The code can be written in any language. You would need to submit the code and the output file in a ZIP file.
 - The output file should be named as `output.csv`.
 - You can make use of classical algorithms or heuristics to solve the problem. The output file should be generated within under a minute on a standard laptop.
