@@ -214,10 +214,16 @@ def validate_solution(
 
     # Check that the non-null ULDs are valid
     count_packed = 0
-    for uld in solution_data["uld_id"]:
+    for row in solution_data.iterrows():
+        uld = row[1]["uld_id"]
         if uld is not None:
             assert uld in uld_ids, f"ULD {uld} not found in ULD data"
             count_packed += 1
+        else:
+            # Check that all the coordinates are -1
+            for coord in ["x1", "y1", "z1", "x2", "y2", "z2"]:
+                assert row[1][coord] == -1, f"Unpacked package {row[1]["package_id"]} has non -1 coordinates"
+
     assert (
         count_packed == number_packages
     ), f"The number of packed packages does not match the reported number of packages"
