@@ -2,3 +2,5 @@ pre-screen/*.csv
 pre-screen/*.zip
 
 *.csv
+data/
+__pycache__

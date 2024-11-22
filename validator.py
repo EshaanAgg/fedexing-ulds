@@ -69,8 +69,9 @@ class Cuboid:
 
 
 class Package(Cuboid):
-    def __init__(self, x1, y1, z1, x2, y2, z2, weight, is_priority, cost):
+    def __init__(self, id, x1, y1, z1, x2, y2, z2, weight, is_priority, cost):
         super().__init__(x1, y1, z1, x2, y2, z2)
+        self.id = id
         self.weight = weight
         self.is_priority = is_priority
         self.cost = cost
@@ -191,7 +192,7 @@ def validate_solution(
     # Validate the solution
     with open(solution_path) as file:
         data_lines = file.readlines()
-        input_data = map(int, data_lines[0].strip().split())
+        input_data = list(map(int, data_lines[0].strip().split()))
 
         assert len(input_data) == 3, "Expected 3 integers in the first line"
         expected_cost, number_packages, priority_ulds = input_data
@@ -202,7 +203,7 @@ def validate_solution(
         names=["package_id", "uld_id", "x1", "y1", "z1", "x2", "y2", "z2"],
     )
     solution_data["uld_id"] = solution_data["uld_id"].apply(
-        lambda x: x if x != "None" else None
+        lambda x: x if x != "NONE" else None
     )
 
     # Check all packages are present in the solution EXACTLY once
@@ -222,7 +223,9 @@ def validate_solution(
         else:
             # Check that all the coordinates are -1
             for coord in ["x1", "y1", "z1", "x2", "y2", "z2"]:
-                assert row[1][coord] == -1, f"Unpacked package {row[1]["package_id"]} has non -1 coordinates"
+                assert (
+                    row[1][coord] == -1
+                ), f"Unpacked package {row[1]['package_id']} has non -1 coordinates"
 
     assert (
         count_packed == number_packages
@@ -241,6 +244,7 @@ def validate_solution(
             continue
 
         package = Package(
+            package_id,
             row["x1"],
             row["y1"],
             row["z1"],
@@ -285,9 +289,9 @@ def validate_solution(
 
 if __name__ == "__main__":
     validate_solution(
-        "./ulds.csv",
-        "./packages.csv",
-        "./solution.csv",
+        "./data/ulds.csv",
+        "./data/packages.csv",
+        "./data/sol_cp_sat.csv",
         diff_package_cost=5000,
         use_spatial_validation=False,
     )
