@@ -9,12 +9,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class PackageLoadingProblem {
     final static String DEFAULT_RAW_RESULT_PATH = "../data/raw_java_choco.csv";
 
-    public static void solveModel() {
-        List<Package> packages = DataLoader.loadPackages();
+    public static void solveModel(Optional<Integer> limit) {
+        List<Package> packages = DataLoader.loadPackages(limit);
         List<ULD> ulds = DataLoader.loadULDs();
 
         int countUld = ulds.size();
@@ -96,8 +97,7 @@ public class PackageLoadingProblem {
             }
         }
 
-        // Weight constraint: Total weight of packages in each ULD must not exceed ULD
-        // capacity
+        // Weight constraint: Total weight of packages in each ULD must not exceed ULD capacity
         for (int j = 0; j < countUld; j++) {
             List<IntVar> vars = new ArrayList<>();
 
@@ -135,14 +135,14 @@ public class PackageLoadingProblem {
     private static void exportSolutionToCSV(BoolVar[][] x, IntVar[][][] start, int countPackages, int countUld,
             String[] dims, String filePath) {
         try (FileWriter writer = new FileWriter(filePath)) {
-            writer.write("package_idx,ukd_idx,x,y,z\n");
+            writer.write("uld_idx,package_idx,x,y,z\n");
             for (int i = 0; i < countPackages; i++) {
                 for (int j = 0; j < countUld; j++) {
                     if (x[i][j].getValue() == 1) { // Check if package i is in ULD j
                         int xStart = start[i][j][0].getValue();
                         int yStart = start[i][j][1].getValue();
                         int zStart = start[i][j][2].getValue();
-                        writer.write(i + "," + j + "," + xStart + "," + yStart + "," + zStart + "\n");
+                        writer.write(j + "," + i + "," + xStart + "," + yStart + "," + zStart + "\n");
                     }
                 }
             }

@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 
 
@@ -60,14 +61,14 @@ def load_data(
 
 
 def generate_solution_file(
-    df,
+    raw_file: str,
     output_file: str = "./data/solution.csv",
     package_file: str = "./data/packages.csv",
     uld_file: str = "./data/ulds.csv",
     priority_spread_cost: int = 5000,
 ):
     """
-    Generates a CSV file in the solution format from the given solution DataFrame.
+    Generates a CSV file in the solution format from the given raw solution file.
     The solution DataFrame should have the following columns:
     - uld_idx: The index of the ULD in which the package is placed
     - package_idx: The index of the package
@@ -75,12 +76,18 @@ def generate_solution_file(
     - y: The y-coordinate of the package in the ULD
     - z: The z-coordinate of the package in the ULD
 
-    @param df: The solution DataFrame.
+    @param raw_file: The path to the raw solution CSV file.
     @param output_file: The path to the output CSV file. Default is "./data/solution.csv".
     @param package_file: The path to the package data CSV file. Default is "./data/packages.csv".
     @param uld_file: The path to the ULD data CSV file. Default is "./data/ulds.csv".
     @param priority_spread_cost: The cost of spreading a priority packages across multiple ULDs. Default is 5000.
     """
+    df = pd.read_csv(
+        raw_file,
+        header=0,
+        names=["uld_idx", "package_idx", "x", "y", "z"],
+    )
+
     package_data, uld_data = load_dfs(package_file, uld_file)
     package_data.rename(columns={"id": "package_id"}, inplace=True)
     uld_data.rename(columns={"id": "uld_id"}, inplace=True)
@@ -141,3 +148,11 @@ def generate_solution_file(
             index=False,
             header=False,
         )
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    raw_file = args[0]
+    output_file = args[1]
+
+    generate_solution_file(raw_file, output_file)

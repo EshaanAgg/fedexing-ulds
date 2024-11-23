@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 from typing import Optional
 from itertools import permutations
@@ -285,3 +286,8 @@ def validate_solution(
     print(
         f"OK: Cost = {total_cost}, Package Count = {number_packages}, Priority ULDs = {priority_ulds}"
     )
+
+
+if __name__ == "__main__":
+    outfile = sys.argv[1]
+    validate_solution(outfile)

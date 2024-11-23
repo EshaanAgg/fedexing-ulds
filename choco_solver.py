@@ -140,5 +140,5 @@ if __name__ == "__main__":
     solution = solve_model(data)
     if solution is not None:
         solution.to_csv("./data/sol_cp_sat_raw.csv", index=False)
-        generate_solution_file(solution, "./data/sol_cp_sat.csv")
+        generate_solution_file("./data/sol_cp_sat_raw.csv", "./data/sol_cp_sat.csv")
         validate_solution("./data/sol_cp_sat.csv")
