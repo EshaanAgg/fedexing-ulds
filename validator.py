@@ -149,11 +149,11 @@ class ULD(Cuboid):
 
 # Validates the solution given the ULD, packages, and solution CSV files
 def validate_solution(
-    uld_path: str,
-    packages_path: str,
     solution_path: str,
-    diff_package_cost: int,
+    uld_path: str = "./data/ulds.csv",
+    packages_path: str = "./data/packages.csv",
     use_spatial_validation=False,
+    diff_package_cost: int = 5000,
 ):
     # Load the ULD data
     uld_df = pd.read_csv(
@@ -284,14 +284,4 @@ def validate_solution(
 
     print(
         f"OK: Cost = {total_cost}, Package Count = {number_packages}, Priority ULDs = {priority_ulds}"
-    )
-
-
-if __name__ == "__main__":
-    validate_solution(
-        "./data/ulds.csv",
-        "./data/packages.csv",
-        "./data/sol_cp_sat.csv",
-        diff_package_cost=5000,
-        use_spatial_validation=False,
     )
