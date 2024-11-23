@@ -1,4 +1,5 @@
 package com.solver;
+
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.variables.IntVar;
@@ -30,7 +31,8 @@ public class PackageLoadingProblem {
         String[] dims = { "length", "width", "height" };
 
         // x[i][j] = 1 if package i is loaded into ULD j, 0 otherwise
-        // start[i][j][d] is the starting position of package i in ULD j along dimension d
+        // start[i][j][d] is the starting position of package i in ULD j along dimension
+        // d
         BoolVar[][] x = new BoolVar[countPackages][countUld];
         IntVar[][][] start = new IntVar[countPackages][countUld][dims.length];
 
@@ -62,7 +64,7 @@ public class PackageLoadingProblem {
                     BoolVar[] intersect = new BoolVar[3];
 
                     for (int d = 0; d < dims.length; d++) {
-                        // x1 < x2 AND x1 + l1 > x2 
+                        // x1 < x2 AND x1 + l1 > x2
                         BoolVar b1 = start[i1][j][d]
                                 .lt(start[i2][j][d])
                                 .and(
@@ -94,7 +96,8 @@ public class PackageLoadingProblem {
             }
         }
 
-        // Weight constraint: Total weight of packages in each ULD must not exceed ULD capacity
+        // Weight constraint: Total weight of packages in each ULD must not exceed ULD
+        // capacity
         for (int j = 0; j < countUld; j++) {
             List<IntVar> vars = new ArrayList<>();
 
@@ -107,14 +110,15 @@ public class PackageLoadingProblem {
             model.sum(vars.toArray(new IntVar[0]), "<=", uldCapacity).post();
         }
 
-        // Objective: Minimize unshipped package costs
+        // Objective: Maximize shipped package costs
         List<IntVar> totalScore = new ArrayList<>();
         for (int i = 0; i < countPackages; i++) {
-            IntVar score = x[i][countUld].mul(packages.get(i).cost).intVar();
-            totalScore.add(score);
+            for (int j = 0; j < countUld; j++) {
+                totalScore.add(x[i][j].mul(packages.get(i).cost).intVar());
+            }
         }
 
-        IntVar finalScore = model.intVar("total_cost", 0, Integer.MAX_VALUE);
+        IntVar finalScore = model.intVar("total_cost", 0, Integer.MAX_VALUE - 1);
         model.sum(totalScore.toArray(new IntVar[0]), "=", finalScore).post();
 
         model.setObjective(Model.MAXIMIZE, finalScore);
@@ -127,8 +131,9 @@ public class PackageLoadingProblem {
             System.out.println("No solution found");
         }
     }
-    
-    private static void exportSolutionToCSV(BoolVar[][] x, IntVar[][][] start, int countPackages, int countUld, String[] dims, String filePath) {
+
+    private static void exportSolutionToCSV(BoolVar[][] x, IntVar[][][] start, int countPackages, int countUld,
+            String[] dims, String filePath) {
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write("package_idx,ukd_idx,x,y,z\n");
             for (int i = 0; i < countPackages; i++) {
@@ -147,4 +152,3 @@ public class PackageLoadingProblem {
         }
     }
 }
-

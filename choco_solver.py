@@ -13,6 +13,8 @@ def solve_model(data):
 
     count_uld = len(ulds)
     count_packages = len(packages)
+    print("ULDs:", ulds)
+    print("Packages:", packages)
 
     # Alternative to INF
     BIG_M = (
@@ -37,22 +39,22 @@ def solve_model(data):
     # Constraints
 
     # Each package must be assigned to one ULD if priority, otherwise at most one ULD
-    for i, package in enumerate(packages):
-        if package["priority"]:
-            model.sum([x[(i, j)] for j in range(count_uld)], "=", 1).post()
-        else:
-            model.sum([x[(i, j)] for j in range(count_uld)], "<=", 1).post()
+    # for i, package in enumerate(packages):
+    #     if package["priority"]:
+    #         model.sum([x[(i, j)] for j in range(count_uld)], "=", 1).post()
+    #     else:
+    #         model.sum([x[(i, j)] for j in range(count_uld)], "<=", 1).post()
 
     # Packages must fit within ULD dimensions
-    for i, package in enumerate(packages):
-        for j, uld in enumerate(ulds):
-            for dim in dims:
-                model.if_then(
-                    x[(i, j)],
-                    model.arithm(
-                        start[(i, j, dim)], "+", (package[dim]), "<=", uld[dim]
-                    ),
-                )
+    # for i, package in enumerate(packages):
+    #     for j, uld in enumerate(ulds):
+    #         for dim in dims:
+    #             model.if_then(
+    #                 x[(i, j)],
+    #                 model.arithm(
+    #                     start[(i, j, dim)], "+", (package[dim]), "<=", uld[dim]
+    #                 ),
+    #             )
 
     # for j in range(count_uld):
     #     for i1 in range(count_packages):
@@ -74,16 +76,16 @@ def solve_model(data):
     #                 ),
     #             )
 
-    # ULD weight constraints
-    for j, uld in enumerate(ulds):
-        total_weight_vars = []
+    # # ULD weight constraints
+    # for j, uld in enumerate(ulds):
+    #     total_weight_vars = []
 
-        for i in range(count_packages):
-            weight_var = model.intvar(0, packages[i]["weight"], f"weight_{i}_{j}")
-            model.times(x[(i, j)], packages[i]["weight"], weight_var).post()
-            total_weight_vars.append(weight_var)
+    #     for i in range(count_packages):
+    #         weight_var = model.intvar(0, packages[i]["weight"], f"weight_{i}_{j}")
+    #         model.times(x[(i, j)], packages[i]["weight"], weight_var).post()
+    #         total_weight_vars.append(weight_var)
 
-        model.sum(total_weight_vars, "<=", uld["capacity"]).post()
+    #     model.sum(total_weight_vars, "<=", uld["capacity"]).post()
 
     # Objective: Minimize the cost of unshipped packages
     total_cost_vars = []
@@ -110,12 +112,6 @@ def solve_model(data):
         maximize=True,
     )
 
-    # If solution is found, display the result
-    if solution:
-        print("Optimal solution found with total cost:", solver.get_objective_value())
-    else:
-        print("No solution found")
-
     # Extract solution
     if solution:
         print("Optimal solution found!")
@@ -123,6 +119,7 @@ def solve_model(data):
         for j in range(count_uld):
             for i in range(count_packages):
                 if solution.get_int_val(x[(i, j)]) == 1:
+                    print("Package", i, "assigned to ULD", j)
                     result.append(
                         {
                             "uld_idx": j,
@@ -139,7 +136,7 @@ def solve_model(data):
 
 
 if __name__ == "__main__":
-    data = load_data(load_frac=0.1)
+    data = load_data(load_frac=1)
     solution = solve_model(data)
     if solution is not None:
         solution.to_csv("./data/sol_cp_sat_raw.csv", index=False)
