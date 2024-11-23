@@ -4,10 +4,14 @@ import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.BoolVar;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PackageLoadingProblem {
+    final static String DEFAULT_RAW_RESULT_PATH = "../data/raw_java_choco.csv";
+
     public static void solveModel() {
         List<Package> packages = DataLoader.loadPackages();
         List<ULD> ulds = DataLoader.loadULDs();
@@ -62,30 +66,30 @@ public class PackageLoadingProblem {
                         BoolVar b1 = start[i1][j][d]
                                 .lt(start[i2][j][d])
                                 .and(
-                                    start[i1][j][d]
-                                        .add(packages.get(i1).get(dims[d]))
-                                        .gt(start[i2][j][d]))
+                                        start[i1][j][d]
+                                                .add(packages.get(i1).get(dims[d]))
+                                                .gt(start[i2][j][d]))
                                 .boolVar();
 
                         // x2 < x1 AND x2 + l2 > x1
                         BoolVar b2 = start[i2][j][d]
                                 .lt(start[i1][j][d])
                                 .and(
-                                    start[i2][j][d]
-                                        .add(packages.get(i2).get(dims[d]))
-                                        .gt(start[i1][j][d]))
+                                        start[i2][j][d]
+                                                .add(packages.get(i2).get(dims[d]))
+                                                .gt(start[i1][j][d]))
                                 .boolVar();
 
                         intersect[d] = b1.or(b2).boolVar();
                     }
-                    
+
                     x[i1][j]
-                        .and(x[i2][j])
-                        .imp(
-                            intersect[0]
-                            .and(intersect[1], intersect[2])
-                            .not()
-                        ).post();  
+                            .and(x[i2][j])
+                            .imp(
+                                    intersect[0]
+                                            .and(intersect[1], intersect[2])
+                                            .not())
+                            .post();
                 }
             }
         }
@@ -118,13 +122,29 @@ public class PackageLoadingProblem {
 
         if (solver.solve()) {
             System.out.println("Solution found!");
+            exportSolutionToCSV(x, start, countPackages, countUld, dims, DEFAULT_RAW_RESULT_PATH);
         } else {
             System.out.println("No solution found");
         }
     }
-
-    public static void main(String[] args) {
-
+    
+    private static void exportSolutionToCSV(BoolVar[][] x, IntVar[][][] start, int countPackages, int countUld, String[] dims, String filePath) {
+        try (FileWriter writer = new FileWriter(filePath)) {
+            writer.write("package_idx,ukd_idx,x,y,z\n");
+            for (int i = 0; i < countPackages; i++) {
+                for (int j = 0; j < countUld; j++) {
+                    if (x[i][j].getValue() == 1) { // Check if package i is in ULD j
+                        int xStart = start[i][j][0].getValue();
+                        int yStart = start[i][j][1].getValue();
+                        int zStart = start[i][j][2].getValue();
+                        writer.write(i + "," + j + "," + xStart + "," + yStart + "," + zStart + "\n");
+                    }
+                }
+            }
+            System.out.println("Solution written to: " + filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
