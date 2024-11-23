@@ -58,7 +58,21 @@ public class PackageLoadingProblem {
             }
         }
 
-        // Intersecton constraint: Packages must not overlap in ULDs
+        // Boundary constraint: Packages must be within ULD boundaries
+        for (int i = 0; i < countPackages; i++) {
+            for (int j = 0; j < countUld; j++) {
+                for (int d = 0; d < dims.length; d++) {
+                    x[i][j].imp(
+                        start[i][j][d]
+                            .add(packages.get(i).get(dims[d]))
+                            .le(ulds.get(j).get(dims[d])
+                        )
+                    ).post();
+                }
+            }
+        }
+
+        // Intersection constraint: Packages must not overlap in ULDs
         for (int j = 0; j < countUld; j++) {
             for (int i1 = 0; i1 < countPackages; i1++) {
                 for (int i2 = i1 + 1; i2 < countPackages; i2++) {
@@ -70,8 +84,9 @@ public class PackageLoadingProblem {
                                 .lt(start[i2][j][d])
                                 .and(
                                         start[i1][j][d]
-                                                .add(packages.get(i1).get(dims[d]))
-                                                .gt(start[i2][j][d]))
+                                            .add(packages.get(i1).get(dims[d]))
+                                            .gt(start[i2][j][d])
+                                    )
                                 .boolVar();
 
                         // x2 < x1 AND x2 + l2 > x1
@@ -79,8 +94,9 @@ public class PackageLoadingProblem {
                                 .lt(start[i1][j][d])
                                 .and(
                                         start[i2][j][d]
-                                                .add(packages.get(i2).get(dims[d]))
-                                                .gt(start[i1][j][d]))
+                                            .add(packages.get(i2).get(dims[d]))
+                                            .gt(start[i1][j][d])
+                                    )
                                 .boolVar();
 
                         intersect[d] = b1.or(b2).boolVar();
@@ -89,9 +105,10 @@ public class PackageLoadingProblem {
                     x[i1][j]
                             .and(x[i2][j])
                             .imp(
-                                    intersect[0]
-                                            .and(intersect[1], intersect[2])
-                                            .not())
+                                intersect[0]
+                                    .and(intersect[1], intersect[2])
+                                    .not()
+                            )
                             .post();
                 }
             }
