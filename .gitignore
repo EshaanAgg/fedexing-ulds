@@ -1,7 +1,8 @@
 pre-screen/*.csv
 pre-screen/*.zip
 
-data/
+.venv/
+./data/
 __pycache__
 
 *.class
