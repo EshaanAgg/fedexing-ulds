@@ -145,6 +145,25 @@ class Package:
 
         return False
 
+    def get_intersection_volume(self, x1, y1, z1, x2, y2, z2):
+        """
+        This method calculates the intersection volume of the package with the
+        cuboid defined by the points (x1, y1, z1) and (x2, y2, z2).
+        This method must be called after the package is placed in the ULD.
+        """
+
+        if self.assigned_uld is None:
+            raise ValueError("Package is not placed in any ULD.")
+
+        dx = min(x2, self.pt2[0]) - max(x1, self.pt1[0])
+        dy = min(y2, self.pt2[1]) - max(y1, self.pt1[1])
+        dz = min(z2, self.pt2[2]) - max(z1, self.pt1[2])
+
+        if dx < 0 or dy < 0 or dz < 0:
+            return 0
+
+        return dx * dy * dz
+
 
 class ULD:
     def __init__(self, id: str, x: int, y: int, z: int, w: int):

@@ -213,13 +213,16 @@ class Packer:
                 if uld.out_of_bounds(opp_x, opp_y, opp_z):
                     continue
 
+                # Check for intersection with already placed packages
                 valid = True
-                for cx, cy, cz in corners:
-                    for other_pack_idx in uld.package_idx:
-                        if self.packages[other_pack_idx].contains(cx, cy, cz):
-                            valid = False
-                            break
-                    if not valid:
+                for pack_idx in uld.package_idx:
+                    if (
+                        self.packages[pack_idx].get_intersection_volume(
+                            origin_x, origin_y, origin_z, opp_x, opp_y, opp_z
+                        )
+                        != 0
+                    ):
+                        valid = False
                         break
                 if not valid:
                     continue
