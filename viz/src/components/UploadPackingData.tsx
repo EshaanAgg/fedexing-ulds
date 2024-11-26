@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Container, Group, Text, Button } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
@@ -28,10 +28,13 @@ const parseCSV = <T,>(file: File): Promise<T[]> => {
   });
 };
 
-const DropzoneUploadedFile: React.FC<{
+function DropzoneUploadedFile({
+  files,
+  name,
+}: {
   files: (File | null)[];
   name: 'uld' | 'package' | 'solution';
-}> = ({ files, name }) => {
+}) {
   let file = null;
   if (name === 'uld') file = files[0];
   if (name === 'package') file = files[1];
@@ -45,9 +48,9 @@ const DropzoneUploadedFile: React.FC<{
       <Text size="xs">You can click here to upload any other file</Text>
     </>
   );
-};
+}
 
-const UploadPackingData: React.FC = () => {
+function UploadPackingData() {
   const { setProblemData } = useProblemDataActions();
 
   const [uldFile, setUldFile] = useState<File | null>(null);
@@ -159,6 +162,6 @@ const UploadPackingData: React.FC = () => {
       </Button>
     </Container>
   );
-};
+}
 
 export default UploadPackingData;

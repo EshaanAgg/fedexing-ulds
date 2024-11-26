@@ -2,7 +2,7 @@ pre-screen/*.csv
 pre-screen/*.zip
 
 .venv/
-./data/
+data/
 __pycache__
 
 *.class

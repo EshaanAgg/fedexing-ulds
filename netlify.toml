@@ -1,0 +1,4 @@
+[build]
+  base = "viz/"
+  publish = "dist/"
+  command = "pnpm install && pnpm run build"
