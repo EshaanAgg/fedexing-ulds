@@ -1,8 +1,9 @@
 import { Mesh } from 'three';
-import { Html } from '@react-three/drei';
 import React, { useRef, useState } from 'react';
+import { Text, Edges } from '@react-three/drei';
 
 import { useUIActions } from '../stores/uiStore';
+import { getCenterCoordinates } from '../utils/3d';
 
 interface Package extends PackageMeta {
   color: string;
@@ -19,16 +20,10 @@ const Package: React.FC<Package> = (props: Package) => {
     else deselectPackage(props.id);
   };
 
-  const centerCoordinates = [
-    props.position[0] + props.size[0] / 2,
-    props.position[1] + props.size[1] / 2,
-    props.position[2] + props.size[2] / 2,
-  ] as [number, number, number];
-
   return (
     <mesh
       ref={meshRef}
-      position={centerCoordinates}
+      position={getCenterCoordinates(props.position, props.size)}
       castShadow
       receiveShadow
       onClick={handleClick}
@@ -36,21 +31,18 @@ const Package: React.FC<Package> = (props: Package) => {
       <boxGeometry args={props.size} />
       <meshStandardMaterial color={props.color} transparent opacity={0.5} />
 
-      {/* Label */}
-      <Html distanceFactor={10}>
-        <div
-          style={{
-            backgroundColor: 'white',
-            padding: '2px 5px',
-            borderRadius: '3px',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          Package {props.id}
-        </div>
-      </Html>
+      {/* 3D Label */}
+      <Text
+        position={[0, 0, 0]}
+        fontSize={0.1}
+        color="black"
+        anchorX="center"
+        anchorY="middle"
+      >
+        Package {props.id}
+      </Text>
+
+      <Edges scale={1.01} color="black" />
     </mesh>
   );
 };
