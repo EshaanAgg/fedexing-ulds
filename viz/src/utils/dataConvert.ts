@@ -1,4 +1,4 @@
-type ULDData = {
+export type ULDData = {
   id: string;
   length: number;
   width: number;
@@ -6,7 +6,7 @@ type ULDData = {
   weight: number;
 };
 
-type PackageData = {
+export type PackageData = {
   id: string;
   length: number;
   width: number;
@@ -16,9 +16,9 @@ type PackageData = {
   cost: number;
 };
 
-type PackingResult = {
-  uldID: string;
-  packageID: string;
+export type PackingResult = {
+  uld_id: string;
+  pack_id: string;
   x1: number;
   y1: number;
   z1: number;
@@ -27,27 +27,27 @@ type PackingResult = {
   z2: number;
 };
 
-type PackingRequest = {
+export type PackingRequest = {
   ulds: ULDData[];
   packages: PackageData[];
   packingResults: PackingResult[];
 };
 
-export const getPlottingData = (request: PackingRequest): ULDMeta[] => {
+export const getProcessedULDs = (request: PackingRequest): ULDMeta[] => {
   const ULDs: ULDMeta[] = [];
 
   for (const row of request.packingResults) {
     // Fetch the target ULD and create one if it doesn't exist
-    const uldData = request.ulds.find((uld) => uld.id === row.uldID);
+    const uldData = request.ulds.find((uld) => uld.id === row.uld_id);
     if (!uldData) {
-      console.error(`ULD with ID ${row.uldID} not found in the request.`);
+      console.error(`ULD with ID ${row.uld_id} not found in the request.`);
       continue;
     }
 
-    let uldIdx = ULDs.findIndex((uld) => uld.id === row.uldID);
+    let uldIdx = ULDs.findIndex((uld) => uld.id === row.uld_id);
     if (uldIdx === -1) {
       ULDs.push({
-        id: row.uldID,
+        id: row.uld_id,
         // Set the position to be origin for now
         position: [0, 0, 0],
         size: [uldData.length, uldData.width, uldData.height],
@@ -58,18 +58,14 @@ export const getPlottingData = (request: PackingRequest): ULDMeta[] => {
     }
 
     // Fetch the target package and create one in the ULD
-    const packageData = request.packages.find(
-      (pkg) => pkg.id === row.packageID,
-    );
+    const packageData = request.packages.find((pkg) => pkg.id === row.pack_id);
     if (!packageData) {
-      console.error(
-        `Package with ID ${row.packageID} not found in the request.`,
-      );
+      console.error(`Package with ID ${row.pack_id} not found in the request.`);
       continue;
     }
 
     ULDs[uldIdx].packages.push({
-      id: row.packageID,
+      id: row.pack_id,
       position: [row.x1, row.y1, row.z1],
       size: [row.x2 - row.x1, row.y2 - row.y1, row.z2 - row.z1],
       weight: packageData.weight,

@@ -7,6 +7,8 @@ Other libraries used in this project are:
 - [Zustand](https://zustand.surge.sh/) for state management
 - [Mantine UI](https://mantine.dev/) for UI components
 - [DREI](https://drei.pmnd.rs/) for useful components and hooks for React Three Fiber
+- [Papa Parse](https://www.papaparse.com/) for parsing CSV files in the browser
+- [Tabler Icons](https://tablericons.com/) for icons
 
 The project is bundled with [Vite](https://vitejs.dev/) and uses [TypeScript](https://www.typescriptlang.org/) for type checking.
 
