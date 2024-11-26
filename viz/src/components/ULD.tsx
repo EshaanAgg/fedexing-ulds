@@ -10,9 +10,9 @@ export const ULD: React.FC<ULDMeta> = (props: ULDMeta) => {
       <Box
         position={props.position}
         size={props.size}
-        color="red"
         id={props.id}
         label={`ULD ${props.id}`}
+        color="none"
       />
 
       {/* Plot the packages */}

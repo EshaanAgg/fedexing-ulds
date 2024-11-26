@@ -76,7 +76,7 @@ export const getProcessedULDs = (request: PackingRequest): ULDMeta[] => {
 
   // Change the ULD positions to be non-overlapping
   // Z = 0 for all, and group the ULDs in multiple rows of rowItems ULD each
-  const padding = 20,
+  const padding = 100,
     rowItems = 3;
 
   let lastY = 0;

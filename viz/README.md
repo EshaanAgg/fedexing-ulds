@@ -14,14 +14,14 @@ The project is bundled with [Vite](https://vitejs.dev/) and uses [TypeScript](ht
 
 ## Setting up the project
 
-We use [PNPM](https://pnpm.io/) as the package manager for this project. To set up the project, run the following commands:
+We use `npm` as the package manager for this project. To set up the project, run the following commands:
 
 ```bash
-pnpm install
+npm install
 ```
 
 To start the development server, run:
 
 ```bash
-pnpm dev
+npm run dev
 ```

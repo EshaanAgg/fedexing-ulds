@@ -25,7 +25,13 @@ function Arena() {
           angle={0.3}
           castShadow
         />
-        <OrbitControls enablePan={false} enableZoom={true} />
+        <OrbitControls
+          enablePan={true}
+          enableZoom={true}
+          enableRotate={true}
+          maxPolarAngle={Math.PI}
+          minPolarAngle={0}
+        />
 
         {/* Plot all the ULDs */}
         {uldData.map((uld) => (

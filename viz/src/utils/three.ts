@@ -1,18 +1,3 @@
 export const getRandomColor = () => {
-  const supportedThreeColors = [
-    'black',
-    'white',
-    'red',
-    'green',
-    'blue',
-    'yellow',
-    'purple',
-    'orange',
-    'cyan',
-    'magenta',
-  ];
-
-  return supportedThreeColors[
-    Math.floor(Math.random() * supportedThreeColors.length)
-  ];
+  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 };
