@@ -33,7 +33,10 @@ export type PackingRequest = {
   packingResults: PackingResult[];
 };
 
-export const getProcessedULDs = (request: PackingRequest): ULDMeta[] => {
+export const getProcessedULDs = (
+  request: PackingRequest,
+  scaleFactor: number = 1 / 100,
+): ULDMeta[] => {
   const ULDs: ULDMeta[] = [];
 
   for (const row of request.packingResults) {
@@ -76,7 +79,7 @@ export const getProcessedULDs = (request: PackingRequest): ULDMeta[] => {
 
   // Change the ULD positions to be non-overlapping
   // Z = 0 for all, and group the ULDs in multiple rows of rowItems ULD each
-  const padding = 100,
+  const padding = 300,
     rowItems = 3;
 
   let lastY = 0;
@@ -94,5 +97,39 @@ export const getProcessedULDs = (request: PackingRequest): ULDMeta[] => {
     lastY += maxY + padding;
   }
 
-  return ULDs;
+  return shiftCoordinates(scaleULDs(ULDs, scaleFactor));
+};
+
+export const scaleULDs = (ULDs: ULDMeta[], scale: number): ULDMeta[] => {
+  return ULDs.map((uld) => ({
+    ...uld,
+    size: [uld.size[0] * scale, uld.size[1] * scale, uld.size[2] * scale],
+    position: [
+      uld.position[0] * scale,
+      uld.position[1] * scale,
+      uld.position[2] * scale,
+    ],
+    packages: uld.packages.map((pkg) => ({
+      ...pkg,
+      size: [pkg.size[0] * scale, pkg.size[1] * scale, pkg.size[2] * scale],
+      position: [
+        pkg.position[0] * scale,
+        pkg.position[1] * scale,
+        pkg.position[2] * scale,
+      ],
+    })),
+  }));
+};
+
+export const shiftCoordinates = (ULDs: ULDMeta[]): ULDMeta[] => {
+  return ULDs.map((uld) => ({
+    ...uld,
+    size: [uld.size[0], uld.size[2], uld.size[1]],
+    position: [uld.position[0], uld.position[2], uld.position[1]],
+    packages: uld.packages.map((pkg) => ({
+      ...pkg,
+      size: [pkg.size[0], pkg.size[2], pkg.size[1]],
+      position: [pkg.position[0], pkg.position[2], pkg.position[1]],
+    })),
+  }));
 };
