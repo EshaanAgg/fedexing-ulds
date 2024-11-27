@@ -1,5 +1,3 @@
-import { Mesh } from 'three';
-import { useRef } from 'react';
 import { Text, Edges } from '@react-three/drei';
 import { getCenterCoordinates } from '../utils/3d';
 
@@ -12,11 +10,8 @@ interface Box {
 }
 
 function Box(props: Box) {
-  const meshRef = useRef<Mesh>(null);
-
   return (
     <mesh
-      ref={meshRef}
       position={getCenterCoordinates(props.position, props.size)}
       castShadow
       receiveShadow

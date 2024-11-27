@@ -5,7 +5,7 @@ import { getRandomColor } from '../utils/three';
 
 export const ULD: React.FC<ULDMeta> = (props: ULDMeta) => {
   return (
-    <>
+    <group>
       {/* Plot the ULD */}
       <Box
         position={props.position}
@@ -24,6 +24,6 @@ export const ULD: React.FC<ULDMeta> = (props: ULDMeta) => {
           id={box.id}
         />
       ))}
-    </>
+    </group>
   );
 };

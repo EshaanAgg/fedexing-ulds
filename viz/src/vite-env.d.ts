@@ -16,3 +16,5 @@ interface ULDMeta {
   packages: PackageMeta[];
   weight: number;
 }
+
+type Vector = [number, number, number];

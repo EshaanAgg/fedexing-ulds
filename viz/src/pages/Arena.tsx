@@ -7,6 +7,7 @@ import { useControls, button, buttonGroup, folder } from 'leva';
 
 import { ULD } from './../components/ULD';
 import { useProcessedUlds } from '../stores/problemDataStore';
+import { getCameraVectors } from '../utils/3d';
 
 const { DEG2RAD } = THREE.MathUtils;
 
@@ -21,6 +22,7 @@ function Scene(props: SceneProps) {
 
   const { camera } = useThree();
 
+  // Grid configuration for the ground
   const gridConfig = {
     cellSize: 0.5,
     cellThickness: 0.5,
@@ -33,6 +35,14 @@ function Scene(props: SceneProps) {
     followCamera: false,
     infiniteGrid: true,
   };
+
+  // Folder group to control the camera movement to the ULDs
+  const cameraFolderItems = props.uldData.map((uld, index) => {
+    const [lookAt, lookFrom] = getCameraVectors(index, uld.position, uld.size);
+    return button(() =>
+      cameraControlsRef.current.setLookAt(...lookFrom, ...lookAt, true),
+    );
+  });
 
   // Camera controls from the hovering menu
   useControls({
@@ -52,22 +62,22 @@ function Scene(props: SceneProps) {
         '+20º': () => cameraControlsRef.current.rotate(0, -20 * DEG2RAD, true),
       },
     }),
-    truckGrp: buttonGroup({
-      label: 'truck',
-      opts: {
-        '(1,0)': () => cameraControlsRef.current.truck(1, 0, true),
-        '(0,1)': () => cameraControlsRef.current.truck(0, 1, true),
-        '(-1,-1)': () => cameraControlsRef.current.truck(-1, -1, true),
-      },
-    }),
     zoomGrp: buttonGroup({
       label: 'Zoom',
       opts: {
-        Close: () => cameraControlsRef.current?.zoom(camera.zoom / 2, true),
-        Far: () => cameraControlsRef.current?.zoom(-camera.zoom / 2, true),
+        Close: () => cameraControlsRef.current.zoom(camera.zoom / 2, true),
+        Far: () => cameraControlsRef.current.zoom(-camera.zoom / 2, true),
       },
     }),
-    "ULD's": folder({}, { collapsed: true }),
+    "ULD's": folder(
+      {
+        ...cameraFolderItems.reduce(
+          (acc, item, index) => ({ ...acc, [`ULD ${index + 1}`]: item }),
+          {},
+        ),
+      },
+      { collapsed: true },
+    ),
     Reset: button(() => cameraControlsRef.current.reset(true)),
   });
 

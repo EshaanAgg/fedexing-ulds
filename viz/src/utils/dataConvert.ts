@@ -100,6 +100,13 @@ export const getProcessedULDs = (
   return shiftCoordinates(scaleULDs(ULDs, scaleFactor));
 };
 
+/**
+ * Scales the ULDs by the given scale factor
+ *
+ * @param ULDs The ULDs to scale
+ * @param scale The scale factor to apply
+ * @returns The scaled ULDs
+ */
 export const scaleULDs = (ULDs: ULDMeta[], scale: number): ULDMeta[] => {
   return ULDs.map((uld) => ({
     ...uld,
@@ -121,6 +128,12 @@ export const scaleULDs = (ULDs: ULDMeta[], scale: number): ULDMeta[] => {
   }));
 };
 
+/**
+ * Shifts the coordinates of the incoming ULD data to match the three.js coordinate system.
+ *
+ * @param ULDs The ULDs to shift
+ * @returns The shifted ULDs
+ */
 export const shiftCoordinates = (ULDs: ULDMeta[]): ULDMeta[] => {
   return ULDs.map((uld) => ({
     ...uld,
