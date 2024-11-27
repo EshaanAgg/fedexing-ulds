@@ -1,3 +1,5 @@
 export const getRandomColor = () => {
-  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+  return '#000000'.replace(/0/g, function () {
+    return (~~(Math.random() * 16)).toString(16);
+  });
 };

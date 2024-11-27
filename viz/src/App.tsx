@@ -1,12 +1,17 @@
-import Arena from './components/Arena';
-import UploadPackingData from './components/UploadPackingData';
-import { useProblemDataAvailable } from './stores/problemDataStore';
+import { BrowserRouter as Router, Routes, Route } from 'react-router';
 
-function App() {
-  const dataAvailable = useProblemDataAvailable();
+import Arena from './pages/Arena';
+import UploadPackingData from './pages/UploadPackingData';
+import DemoArena from './pages/DemoArena';
 
-  if (!dataAvailable) return <UploadPackingData />;
-  return <Arena />;
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<UploadPackingData />} />
+        <Route path="/arena" element={<Arena />} />
+        <Route path="/demo-arena" element={<DemoArena />} />
+      </Routes>
+    </Router>
+  );
 }
-
-export default App;

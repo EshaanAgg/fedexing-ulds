@@ -7,6 +7,7 @@ import type { ULDData, PackageData, PackingResult } from '../utils/dataConvert';
 import { IconUpload, IconX } from '@tabler/icons-react';
 import { useProblemDataActions } from '../stores/problemDataStore';
 import { getProcessedULDs } from '../utils/dataConvert';
+import { useNavigate } from 'react-router';
 
 const parseCSV = <T,>(file: File): Promise<T[]> => {
   return new Promise((resolve, reject) => {
@@ -52,6 +53,7 @@ function DropzoneUploadedFile({
 
 function UploadPackingData() {
   const { setProblemData } = useProblemDataActions();
+  const navigate = useNavigate();
 
   const [uldFile, setUldFile] = useState<File | null>(null);
   const [packageFile, setPackageFile] = useState<File | null>(null);
@@ -110,6 +112,7 @@ function UploadPackingData() {
         message: 'The files have been processed successfully!',
         color: 'green',
       });
+      navigate('/arena');
     } catch (err) {
       console.error(`Error processing files: ${err}`);
     }

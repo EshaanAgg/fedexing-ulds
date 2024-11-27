@@ -4,7 +4,7 @@ import { Text, Edges } from '@react-three/drei';
 import { getCenterCoordinates } from '../utils/3d';
 
 interface Box {
-  color: string;
+  color?: string;
   position: [number, number, number];
   size: [number, number, number];
   id: string;

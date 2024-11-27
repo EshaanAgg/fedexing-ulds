@@ -12,7 +12,6 @@ export const ULD: React.FC<ULDMeta> = (props: ULDMeta) => {
         size={props.size}
         id={props.id}
         label={`ULD ${props.id}`}
-        color="none"
       />
 
       {/* Plot the packages */}

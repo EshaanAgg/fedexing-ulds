@@ -1,14 +1,21 @@
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { CameraControls } from '@react-three/drei';
+import { Text } from '@mantine/core';
+
+import { ULD } from './../components/ULD';
+import Ground from './../components/Ground';
 import { useProcessedUlds } from '../stores/problemDataStore';
-import { ULD } from './ULD';
 
 const MAX_DISTANCE = 700;
+const MIN_DISTANCE = 50;
 
 function Arena() {
   const uldData = useProcessedUlds();
 
-  if (uldData.length === 0) return null;
+  if (uldData.length === 0)
+    return (
+      <Text>No ULD data found. Please upload a CSV file with ULD data.</Text>
+    );
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -25,13 +32,9 @@ function Arena() {
           angle={0.3}
           castShadow
         />
-        <OrbitControls
-          enablePan={true}
-          enableZoom={true}
-          enableRotate={true}
-          maxPolarAngle={Math.PI}
-          minPolarAngle={0}
-        />
+
+        <CameraControls minDistance={MIN_DISTANCE} enabled />
+        <Ground position={[0, -0.01, 0]} args={[10.5, 10.5]} />
 
         {/* Plot all the ULDs */}
         {uldData.map((uld) => (
