@@ -1,24 +1,45 @@
 import Papa from 'papaparse';
 import { useState } from 'react';
-import { Container, Group, Text, Button } from '@mantine/core';
+import { ZodSchema } from 'zod';
+import { useNavigate } from 'react-router';
 import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
-import type { ULDData, PackageData, PackingResult } from '../utils/dataConvert';
 import { IconUpload, IconX } from '@tabler/icons-react';
-import { useProblemDataActions } from '../stores/problemDataStore';
-import { getProcessedULDs } from '../utils/dataConvert';
-import { useNavigate } from 'react-router';
+import { Container, Group, Text, Button } from '@mantine/core';
 
-const parseCSV = <T,>(file: File): Promise<T[]> => {
+import {
+  getProcessedULDs,
+  PackageDataSchema,
+  PackingResultSchema,
+  ULDDataSchema,
+} from '../utils/dataConvert';
+import { useProblemDataActions } from '../stores/problemDataStore';
+import type { ULDData, PackageData, PackingResult } from '../utils/dataConvert';
+
+const parseCSV = <T,>(file: File, schema: ZodSchema<T>): Promise<T[]> => {
   return new Promise((resolve, reject) => {
     Papa.parse<T>(file, {
       header: true,
       dynamicTyping: true,
       skipEmptyLines: true,
-      complete: (results: { data: T[] }) => resolve(results.data),
+      complete: (results: { data: T[] }) => {
+        try {
+          // Validate each row against the schema
+          const validatedData = results.data.map((row) => schema.parse(row));
+          resolve(validatedData);
+        } catch (validationError) {
+          notifications.show({
+            title: 'Validation Error',
+            message: `Some rows in the CSV file did not match the expected format: ${validationError}`,
+            color: 'red',
+            icon: <IconX size={16} />,
+          });
+          reject(validationError);
+        }
+      },
       error: (error: unknown) => {
         notifications.show({
-          title: 'Error parsing CSV',
+          title: 'Error Parsing CSV',
           message: 'An error occurred while parsing the CSV file.',
           color: 'red',
           icon: <IconX size={16} />,
@@ -96,9 +117,9 @@ function UploadPackingData() {
       });
 
       const [ulds, packages, packingResults] = await Promise.all([
-        parseCSV<ULDData>(uldFile),
-        parseCSV<PackageData>(packageFile),
-        parseCSV<PackingResult>(solutionFile),
+        parseCSV<ULDData>(uldFile, ULDDataSchema),
+        parseCSV<PackageData>(packageFile, PackageDataSchema),
+        parseCSV<PackingResult>(solutionFile, PackingResultSchema),
       ]);
 
       setProblemData({

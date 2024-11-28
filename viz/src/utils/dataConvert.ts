@@ -1,31 +1,36 @@
-export type ULDData = {
-  id: string;
-  length: number;
-  width: number;
-  height: number;
-  weight: number;
-};
+import { z } from 'zod';
 
-export type PackageData = {
-  id: string;
-  length: number;
-  width: number;
-  height: number;
-  weight: number;
-  priority: boolean;
-  cost: number;
-};
+export const ULDDataSchema = z.object({
+  id: z.string(),
+  length: z.number(),
+  width: z.number(),
+  height: z.number(),
+  weight: z.number(),
+});
+export type ULDData = z.infer<typeof ULDDataSchema>;
 
-export type PackingResult = {
-  uld_id: string;
-  pack_id: string;
-  x1: number;
-  y1: number;
-  z1: number;
-  x2: number;
-  y2: number;
-  z2: number;
-};
+export const PackageDataSchema = z.object({
+  id: z.string(),
+  length: z.number(),
+  width: z.number(),
+  height: z.number(),
+  weight: z.number(),
+  priority: z.boolean(),
+  cost: z.number(),
+});
+export type PackageData = z.infer<typeof PackageDataSchema>;
+
+export const PackingResultSchema = z.object({
+  uld_id: z.string(),
+  pack_id: z.string(),
+  x1: z.number(),
+  y1: z.number(),
+  z1: z.number(),
+  x2: z.number(),
+  y2: z.number(),
+  z2: z.number(),
+});
+export type PackingResult = z.infer<typeof PackingResultSchema>;
 
 export type PackingRequest = {
   ulds: ULDData[];
@@ -97,7 +102,7 @@ export const getProcessedULDs = (
     lastY += maxY + padding;
   }
 
-  return shiftCoordinates(scaleULDs(ULDs, scaleFactor));
+  return scaleULDs(shiftCoordinates(ULDs), scaleFactor);
 };
 
 /**
@@ -137,12 +142,12 @@ export const scaleULDs = (ULDs: ULDMeta[], scale: number): ULDMeta[] => {
 export const shiftCoordinates = (ULDs: ULDMeta[]): ULDMeta[] => {
   return ULDs.map((uld) => ({
     ...uld,
-    size: [uld.size[0], uld.size[2], uld.size[1]],
-    position: [uld.position[0], uld.position[2], uld.position[1]],
+    size: [uld.size[0], uld.size[2], -uld.size[1]],
+    position: [uld.position[0], uld.position[2], -uld.position[1]],
     packages: uld.packages.map((pkg) => ({
       ...pkg,
-      size: [pkg.size[0], pkg.size[2], pkg.size[1]],
-      position: [pkg.position[0], pkg.position[2], pkg.position[1]],
+      size: [pkg.size[0], pkg.size[2], -pkg.size[1]],
+      position: [pkg.position[0], pkg.position[2], -pkg.position[1]],
     })),
   }));
 };

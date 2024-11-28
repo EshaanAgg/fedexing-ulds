@@ -1,6 +1,7 @@
 import Box from './Box';
-import { addCoordinates } from '../utils/3d';
-import { getRandomColor } from '../utils/three';
+import randomColor from 'randomcolor';
+import { Billboard, Edges, Text } from '@react-three/drei';
+import { addCoordinates, getCenterCoordinates } from '../utils/3d';
 
 interface ULDProps {
   uld: ULDMeta;
@@ -12,20 +13,33 @@ export const ULD = (props: ULDProps) => {
   return (
     <group>
       {/* Plot the ULD */}
-      <Box
-        position={uldData.position}
-        size={uldData.size}
-        id={uldData.id}
-        label={`ULD ${uldData.id}`}
-      />
+      <mesh position={getCenterCoordinates(props.uld.position, props.uld.size)}>
+        <lineBasicMaterial transparent opacity={0.4} />
+        <boxGeometry args={uldData.size} />
+        <Edges visible scale={1.01} color="black" />
+        <Billboard>
+          <Text
+            fontSize={0.2}
+            color="black"
+            anchorX="center"
+            anchorY="middle"
+            position={[0, 0, 0]}
+          >
+            {uldData.id} ({uldData.packages.length})
+          </Text>
+        </Billboard>
+      </mesh>
 
       {/* Plot the packages */}
       {uldData.packages.map((box) => (
         <Box
           key={box.id}
-          position={addCoordinates(box.position, uldData.position)}
+          center={addCoordinates(
+            uldData.position,
+            getCenterCoordinates(box.position, box.size),
+          )}
           size={box.size}
-          color={getRandomColor()}
+          color={randomColor()}
           id={box.id}
         />
       ))}

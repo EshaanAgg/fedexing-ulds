@@ -1,9 +1,10 @@
 import Papa from 'papaparse';
 import { useEffect } from 'react';
-import type { ULDData, PackageData, PackingResult } from '../utils/dataConvert';
-import { useProblemDataActions } from '../stores/problemDataStore';
-import { getProcessedULDs } from '../utils/dataConvert';
+
 import Arena from './Arena';
+import { getProcessedULDs } from '../utils/dataConvert';
+import { useProblemDataActions } from '../stores/problemDataStore';
+import type { ULDData, PackageData, PackingResult } from '../utils/dataConvert';
 
 const fetchAndParseCSV = async <T,>(url: string): Promise<T[]> => {
   const fileContent = await fetch(url).then((response) => response.text());

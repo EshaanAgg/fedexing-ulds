@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import { Text } from '@mantine/core';
 import { useRef } from 'react';
+import { Text } from '@mantine/core';
+import { useControls, button, buttonGroup } from 'leva';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Center,
@@ -9,7 +10,6 @@ import {
   KeyboardControls,
   useKeyboardControls,
 } from '@react-three/drei';
-import { useControls, button, buttonGroup } from 'leva';
 
 import { ULD } from './../components/ULD';
 import { useProcessedUlds } from '../stores/problemDataStore';
@@ -95,6 +95,7 @@ function Scene(props: SceneProps) {
 
   return (
     <>
+      {/* Visible Elements */}
       <group position-y={-0.5}>
         <Center top>
           <mesh>
@@ -104,11 +105,12 @@ function Scene(props: SceneProps) {
           </mesh>
         </Center>
 
-        <Grid position={[0, -0.01, 0]} args={[10.5, 10.5]} {...gridConfig} />
+        {/* Camera */}
         <CameraControls enabled ref={cameraControlsRef} />
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[0, 5, 5]} intensity={1.5} />
-        <directionalLight position={[5, 5, 0]} intensity={1.5} />
+
+        {/* Ground and lighting */}
+        <Grid position={[0, -0.01, 0]} args={[10.5, 10.5]} {...gridConfig} />
+        <ambientLight intensity={0.6} />
       </group>
     </>
   );
@@ -116,6 +118,8 @@ function Scene(props: SceneProps) {
 
 function Arena() {
   const uldData = useProcessedUlds();
+
+  console.log(uldData);
 
   if (uldData.length === 0)
     return (
