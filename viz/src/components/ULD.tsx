@@ -1,24 +1,29 @@
-import React from 'react';
 import Box from './Box';
 import { addCoordinates } from '../utils/3d';
 import { getRandomColor } from '../utils/three';
 
-export const ULD: React.FC<ULDMeta> = (props: ULDMeta) => {
+interface ULDProps {
+  uld: ULDMeta;
+}
+
+export const ULD = (props: ULDProps) => {
+  const uldData = props.uld;
+
   return (
     <group>
       {/* Plot the ULD */}
       <Box
-        position={props.position}
-        size={props.size}
-        id={props.id}
-        label={`ULD ${props.id}`}
+        position={uldData.position}
+        size={uldData.size}
+        id={uldData.id}
+        label={`ULD ${uldData.id}`}
       />
 
       {/* Plot the packages */}
-      {props.packages.map((box) => (
+      {uldData.packages.map((box) => (
         <Box
           key={box.id}
-          position={addCoordinates(box.position, props.position)}
+          position={addCoordinates(box.position, uldData.position)}
           size={box.size}
           color={getRandomColor()}
           id={box.id}

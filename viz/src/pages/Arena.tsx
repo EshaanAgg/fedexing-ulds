@@ -1,17 +1,20 @@
 import * as THREE from 'three';
 import { Text } from '@mantine/core';
 import { useRef } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
-import { Center, Grid, CameraControls } from '@react-three/drei';
-import { useControls, button, buttonGroup, folder } from 'leva';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import {
+  Center,
+  Grid,
+  CameraControls,
+  KeyboardControls,
+  useKeyboardControls,
+} from '@react-three/drei';
+import { useControls, button, buttonGroup } from 'leva';
 
 import { ULD } from './../components/ULD';
 import { useProcessedUlds } from '../stores/problemDataStore';
-import { getCameraVectors } from '../utils/3d';
 
 const { DEG2RAD } = THREE.MathUtils;
-
-<div style={{ width: '100vw', height: '100vh' }}></div>;
 
 interface SceneProps {
   uldData: ULDMeta[];
@@ -36,49 +39,58 @@ function Scene(props: SceneProps) {
     infiniteGrid: true,
   };
 
-  // Folder group to control the camera movement to the ULDs
-  const cameraFolderItems = props.uldData.map((uld, index) => {
-    const [lookAt, lookFrom] = getCameraVectors(index, uld.position, uld.size);
-    return button(() =>
-      cameraControlsRef.current.setLookAt(...lookFrom, ...lookAt, true),
-    );
-  });
-
   // Camera controls from the hovering menu
-  useControls({
-    thetaGrp: buttonGroup({
-      label: 'Rotate Theta',
-      opts: {
-        '-90º': () => cameraControlsRef.current.rotate(-90 * DEG2RAD, 0, true),
-        '-45º': () => cameraControlsRef.current.rotate(-45 * DEG2RAD, 0, true),
-        '+45º': () => cameraControlsRef.current.rotate(45 * DEG2RAD, 0, true),
-        '+90º': () => cameraControlsRef.current.rotate(90 * DEG2RAD, 0, true),
-      },
-    }),
-    phiGrp: buttonGroup({
-      label: 'Rotate Phi',
-      opts: {
-        '-20º': () => cameraControlsRef.current.rotate(0, 20 * DEG2RAD, true),
-        '+20º': () => cameraControlsRef.current.rotate(0, -20 * DEG2RAD, true),
-      },
-    }),
-    zoomGrp: buttonGroup({
-      label: 'Zoom',
-      opts: {
-        Close: () => cameraControlsRef.current.zoom(camera.zoom / 2, true),
-        Far: () => cameraControlsRef.current.zoom(-camera.zoom / 2, true),
-      },
-    }),
-    "ULD's": folder(
-      {
-        ...cameraFolderItems.reduce(
-          (acc, item, index) => ({ ...acc, [`ULD ${index + 1}`]: item }),
-          {},
-        ),
-      },
-      { collapsed: true },
-    ),
-    Reset: button(() => cameraControlsRef.current.reset(true)),
+  useControls(
+    'General',
+    {
+      thetaGrp: buttonGroup({
+        label: 'Rotate Theta',
+        opts: {
+          '-90º': () =>
+            cameraControlsRef.current.rotate(-90 * DEG2RAD, 0, true),
+          '-45º': () =>
+            cameraControlsRef.current.rotate(-45 * DEG2RAD, 0, true),
+          '+45º': () => cameraControlsRef.current.rotate(45 * DEG2RAD, 0, true),
+          '+90º': () => cameraControlsRef.current.rotate(90 * DEG2RAD, 0, true),
+        },
+      }),
+      phiGrp: buttonGroup({
+        label: 'Rotate Phi',
+        opts: {
+          '-20º': () => cameraControlsRef.current.rotate(0, 20 * DEG2RAD, true),
+          '+20º': () =>
+            cameraControlsRef.current.rotate(0, -20 * DEG2RAD, true),
+        },
+      }),
+      translateGrp: buttonGroup({
+        label: 'Height',
+        opts: {
+          Up: () => cameraControlsRef.current.truck(0, -1, true),
+          Down: () => cameraControlsRef.current.truck(0, 1, true),
+        },
+      }),
+      zoomGrp: buttonGroup({
+        label: 'Zoom',
+        opts: {
+          Close: () => cameraControlsRef.current.zoom(camera.zoom / 2, true),
+          Far: () => cameraControlsRef.current.zoom(-camera.zoom / 2, true),
+        },
+      }),
+      Reset: button(() => cameraControlsRef.current.reset(true)),
+    },
+    { collapsed: true },
+  );
+
+  // Keyboard controls for the camera
+  const [, get] = useKeyboardControls();
+  useFrame((_, delta) => {
+    const { forward, backward, left, right } = get();
+    const SPEED = 5;
+
+    if (forward) cameraControlsRef.current.forward(SPEED * delta);
+    if (backward) cameraControlsRef.current.forward(-SPEED * delta);
+    if (left) cameraControlsRef.current.truck(-SPEED * delta, 0, true);
+    if (right) cameraControlsRef.current.truck(SPEED * delta, 0, true);
   });
 
   return (
@@ -87,13 +99,16 @@ function Scene(props: SceneProps) {
         <Center top>
           <mesh>
             {props.uldData.map((uld, index) => (
-              <ULD key={index} {...uld} />
+              <ULD key={index} uld={uld} />
             ))}
           </mesh>
         </Center>
-        {/* Ground */}
+
         <Grid position={[0, -0.01, 0]} args={[10.5, 10.5]} {...gridConfig} />
         <CameraControls enabled ref={cameraControlsRef} />
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[0, 5, 5]} intensity={1.5} />
+        <directionalLight position={[5, 5, 0]} intensity={1.5} />
       </group>
     </>
   );
@@ -110,7 +125,16 @@ function Arena() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas shadows camera={{ position: [0, 5, 10], fov: 60 }}>
-        <Scene uldData={uldData} />
+        <KeyboardControls
+          map={[
+            { name: 'forward', keys: ['ArrowUp', 'w', 'W'] },
+            { name: 'backward', keys: ['ArrowDown', 's', 'S'] },
+            { name: 'left', keys: ['ArrowLeft', 'a', 'A'] },
+            { name: 'right', keys: ['ArrowRight', 'd', 'D'] },
+          ]}
+        >
+          <Scene uldData={uldData} />
+        </KeyboardControls>
       </Canvas>
     </div>
   );
