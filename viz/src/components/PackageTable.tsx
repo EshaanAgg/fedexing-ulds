@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Grid, MultiSelect, Switch, Tooltip } from '@mantine/core';
+import { Grid, MultiSelect, Switch } from '@mantine/core';
 import { MantineReactTable } from 'mantine-react-table';
 
 import { usePackages, useUlds } from '../stores/problemDataStore';
@@ -78,6 +78,14 @@ const ExpandedRow = (props: ExpandedRowProps) => {
           onChange={(_) => actions.toggleHeavyPackage(props.data.id)}
         />
       </Grid.Col>
+
+      <Grid.Col span={3}>
+        <Switch
+          label="Fragile Package"
+          checked={getIsFragilePackage(props.data.id)}
+          onChange={(_) => actions.toggleFragilePackage(props.data.id)}
+        />
+      </Grid.Col>
     </Grid>
   );
 };
@@ -104,6 +112,7 @@ const PackageTable = () => {
       mantineTableBodyCellProps: {
         align: (col.numeric ? 'center' : 'left') as Alignment,
       },
+      size: 50,
     }));
   }, []);
 
@@ -123,6 +132,7 @@ const PackageTable = () => {
         showRowsPerPage: false,
         __size: 'xs',
       }}
+      enableTopToolbar={false}
       renderDetailPanel={({ row }) => (
         <ExpandedRow
           data={row.original}

@@ -133,7 +133,7 @@ function UploadPackingData() {
         message: 'The files have been processed successfully!',
         color: 'green',
       });
-      navigate('/arena');
+      navigate('/review');
     } catch (err) {
       console.error(`Error processing files: ${err}`);
     }
