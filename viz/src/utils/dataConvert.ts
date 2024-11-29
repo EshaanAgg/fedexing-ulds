@@ -15,7 +15,7 @@ export const PackageDataSchema = z.object({
   width: z.number(),
   height: z.number(),
   weight: z.number(),
-  priority: z.boolean(),
+  priority: z.coerce.boolean(),
   cost: z.number(),
 });
 export type PackageData = z.infer<typeof PackageDataSchema>;

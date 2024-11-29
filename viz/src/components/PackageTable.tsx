@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Grid, MultiSelect, Switch } from '@mantine/core';
+import { Grid, MultiSelect, Switch, Text } from '@mantine/core';
 import { MantineReactTable } from 'mantine-react-table';
 
 import { usePackages, useUlds } from '../stores/problemDataStore';
@@ -91,6 +91,7 @@ const ExpandedRow = (props: ExpandedRowProps) => {
 };
 
 type Alignment = 'left' | 'center' | 'right';
+type CellProps = { cell: { getValue: () => unknown } };
 
 const PackageTable = () => {
   const columns = useMemo(() => {
@@ -100,7 +101,13 @@ const PackageTable = () => {
       { header: 'Width', accessorKey: 'width', numeric: true },
       { header: 'Height', accessorKey: 'height', numeric: true },
       { header: 'Weight', accessorKey: 'weight', numeric: true },
-      { header: 'Priority', accessorKey: 'priority' },
+      {
+        header: 'Type',
+        accessorKey: 'priority',
+        Cell: ({ cell }: CellProps) => (
+          <Text size="sm">{cell.getValue() ? 'Priority' : 'Economy'}</Text>
+        ),
+      },
       { header: 'Cost', accessorKey: 'cost', numeric: true },
     ];
 
