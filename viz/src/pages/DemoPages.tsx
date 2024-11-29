@@ -1,7 +1,6 @@
 import Papa from 'papaparse';
 import { useEffect } from 'react';
 
-import Arena from './Arena';
 import { getProcessedULDs } from '../utils/dataConvert';
 import { useProblemDataActions } from '../stores/problemDataStore';
 import type { ULDData, PackageData, PackingResult } from '../utils/dataConvert';
@@ -21,7 +20,14 @@ const fetchAndParseCSV = async <T,>(url: string): Promise<T[]> => {
   });
 };
 
-export default function DemoArena() {
+// Change the function to accept a childreb for the Arena component
+// and return a new component that loads the sample data
+
+interface DemoPagesProps {
+  children: React.ReactNode;
+}
+
+export default function DemoPages({ children }: DemoPagesProps) {
   const { setProblemData } = useProblemDataActions();
 
   useEffect(() => {
@@ -52,5 +58,5 @@ export default function DemoArena() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <Arena />;
+  return <>{children}</>;
 }

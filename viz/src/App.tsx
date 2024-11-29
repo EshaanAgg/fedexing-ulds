@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router';
 
 import Arena from './pages/Arena';
-import DemoArena from './pages/DemoArena';
+import DemoPages from './pages/DemoPages';
+import PackageTable from './components/PackageTable';
 import UploadPackingData from './pages/UploadPackingData';
 
 export default function App() {
@@ -10,7 +11,24 @@ export default function App() {
       <Routes>
         <Route path="/" element={<UploadPackingData />} />
         <Route path="/arena" element={<Arena />} />
-        <Route path="/demo-arena" element={<DemoArena />} />
+
+        {/* Demo paths for testing the components */}
+        <Route
+          path="/demo/arena"
+          element={
+            <DemoPages>
+              <Arena />
+            </DemoPages>
+          }
+        />
+        <Route
+          path="/demo/ptable"
+          element={
+            <DemoPages>
+              <PackageTable />
+            </DemoPages>
+          }
+        />
       </Routes>
     </Router>
   );
