@@ -2,6 +2,7 @@ import Box from './Box';
 import randomColor from 'randomcolor';
 import { Billboard, Edges, Text } from '@react-three/drei';
 import { addCoordinates, getCenterCoordinates } from '../utils/3d';
+import { useActiveUldActions } from '../stores/activeUldStore';
 
 interface ULDProps {
   uld: ULDMeta;
@@ -9,9 +10,10 @@ interface ULDProps {
 
 export const ULD = (props: ULDProps) => {
   const uldData = props.uld;
+  const { activateUld } = useActiveUldActions();
 
   return (
-    <group>
+    <group onClick={() => activateUld(uldData.id)}>
       {/* Plot the ULD */}
       <mesh position={getCenterCoordinates(props.uld.position, props.uld.size)}>
         <lineBasicMaterial transparent opacity={0.4} />

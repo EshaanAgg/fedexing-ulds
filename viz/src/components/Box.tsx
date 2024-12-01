@@ -1,4 +1,5 @@
 import { Text, Edges, Billboard } from '@react-three/drei';
+import { addCoordinates } from '../utils/3d';
 
 interface Box {
   color?: string;
@@ -8,9 +9,12 @@ interface Box {
   label?: string;
 }
 
+const OFFSET_VECTOR = [0.001, 0.001, 0.001] as Vector;
+
 function Box(props: Box) {
   return (
-    <mesh position={props.center}>
+    // Add the offset to prevent z-fighting
+    <mesh position={addCoordinates(OFFSET_VECTOR, props.center)}>
       <boxGeometry args={props.size} />
       <meshStandardMaterial color={props.color} transparent opacity={0.5} />
 
@@ -19,7 +23,7 @@ function Box(props: Box) {
         <Billboard>
           <Text
             position={[0, 0, 0]}
-            fontSize={0.4}
+            fontSize={0.8}
             color="black"
             anchorX="center"
             anchorY="middle"

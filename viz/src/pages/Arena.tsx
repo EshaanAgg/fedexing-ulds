@@ -119,8 +119,6 @@ function Scene(props: SceneProps) {
 function Arena() {
   const uldData = useProcessedUlds();
 
-  console.log(uldData);
-
   if (uldData.length === 0)
     return (
       <Text>No ULD data found. Please upload a CSV file with ULD data.</Text>

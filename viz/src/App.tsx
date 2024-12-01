@@ -8,11 +8,13 @@ import DataReview from './pages/DataReview';
 import DoesNotExist from './pages/DoesNotExist';
 import PackageTable from './components/PackageTable';
 import UploadPackingData from './pages/UploadSolutionData';
+import ULDInformation from './components/ULDInformation';
 
 export default function App() {
   return (
     <Router>
       <Header />
+      <ULDInformation />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/arena" element={<Arena />} />

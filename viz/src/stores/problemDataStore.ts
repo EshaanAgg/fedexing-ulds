@@ -7,6 +7,7 @@ interface ProblemDataState {
   packingResults: PackingResult[];
   processedUlds: ULDMeta[];
   dataAvailable: boolean;
+
   actions: {
     setProblemData: (data: {
       packages: PackageData[];
