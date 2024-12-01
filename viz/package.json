@@ -12,6 +12,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@gsap/react": "^2.1.1",
     "@mantine/core": "^7.14.2",
     "@mantine/dates": "^7.14.3",
     "@mantine/dropzone": "^7.14.2",

@@ -1,5 +1,4 @@
 import Box from './Box';
-import randomColor from 'randomcolor';
 import { Billboard, Edges, Text } from '@react-three/drei';
 import { addCoordinates, getCenterCoordinates } from '../utils/3d';
 import { useActiveUldActions } from '../stores/activeUldStore';
@@ -41,7 +40,7 @@ export const ULD = (props: ULDProps) => {
             getCenterCoordinates(box.position, box.size),
           )}
           size={box.size}
-          color={randomColor()}
+          color={box.color}
           id={box.id}
         />
       ))}

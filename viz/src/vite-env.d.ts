@@ -7,6 +7,7 @@ interface PackageMeta {
   weight: number;
   priority: boolean;
   cost: number;
+  color: string;
 }
 
 interface ULDMeta {

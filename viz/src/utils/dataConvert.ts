@@ -1,3 +1,4 @@
+import randomColor from 'randomcolor';
 import { z } from 'zod';
 
 export const ULDDataSchema = z.object({
@@ -79,6 +80,7 @@ export const getProcessedULDs = (
       weight: packageData.weight,
       priority: packageData.priority,
       cost: packageData.cost,
+      color: randomColor(),
     });
   }
 
