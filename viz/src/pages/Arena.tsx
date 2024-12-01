@@ -5,7 +5,6 @@ import { useControls, button, buttonGroup } from 'leva';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Center,
-  Grid,
   CameraControls,
   KeyboardControls,
   useKeyboardControls,
@@ -13,6 +12,7 @@ import {
 
 import { ULD } from './../components/ULD';
 import { useProcessedUlds } from '../stores/problemDataStore';
+import Ground from '../components/Ground';
 
 const { DEG2RAD } = THREE.MathUtils;
 
@@ -24,20 +24,6 @@ function Scene(props: SceneProps) {
   const cameraControlsRef = useRef<CameraControls>(null!);
 
   const { camera } = useThree();
-
-  // Grid configuration for the ground
-  const gridConfig = {
-    cellSize: 0.5,
-    cellThickness: 0.5,
-    cellColor: '#6f6f6f',
-    sectionSize: 3,
-    sectionThickness: 1,
-    sectionColor: '#9d4b4b',
-    fadeDistance: 30,
-    fadeStrength: 1,
-    followCamera: false,
-    infiniteGrid: true,
-  };
 
   // Camera controls from the hovering menu
   useControls(
@@ -105,11 +91,8 @@ function Scene(props: SceneProps) {
           </mesh>
         </Center>
 
-        {/* Camera */}
         <CameraControls enabled ref={cameraControlsRef} />
-
-        {/* Ground and lighting */}
-        <Grid position={[0, -0.01, 0]} args={[10.5, 10.5]} {...gridConfig} />
+        <Ground />
         <ambientLight intensity={0.6} />
       </group>
     </>

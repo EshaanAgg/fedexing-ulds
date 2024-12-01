@@ -6,6 +6,7 @@ import DemoPages from './pages/DemoPages';
 import Header from './components/Header';
 import DataReview from './pages/DataReview';
 import DoesNotExist from './pages/DoesNotExist';
+import ULDAnimate from './components/ULDAnimate';
 import PackageTable from './components/PackageTable';
 import UploadPackingData from './pages/UploadSolutionData';
 import ULDInformation from './components/ULDInformation';
@@ -35,6 +36,14 @@ export default function App() {
           element={
             <DemoPages>
               <PackageTable />
+            </DemoPages>
+          }
+        />
+        <Route
+          path="/demo/animate"
+          element={
+            <DemoPages>
+              <ULDAnimate uldIndex={0} />
             </DemoPages>
           }
         />

@@ -1,5 +1,5 @@
-import { Text, Edges, Billboard } from '@react-three/drei';
 import { addCoordinates } from '../utils/3d';
+import { Text, Edges, Billboard } from '@react-three/drei';
 
 interface Box {
   color?: string;

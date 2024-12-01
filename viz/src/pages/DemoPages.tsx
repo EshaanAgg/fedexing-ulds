@@ -2,7 +2,10 @@ import Papa from 'papaparse';
 import { useEffect } from 'react';
 
 import { getProcessedULDs } from '../utils/dataConvert';
-import { useProblemDataActions } from '../stores/problemDataStore';
+import {
+  useProblemDataActions,
+  useProcessedUlds,
+} from '../stores/problemDataStore';
 import type { ULDData, PackageData, PackingResult } from '../utils/dataConvert';
 
 const fetchAndParseCSV = async <T,>(url: string): Promise<T[]> => {
@@ -29,6 +32,7 @@ interface DemoPagesProps {
 
 export default function DemoPages({ children }: DemoPagesProps) {
   const { setProblemData } = useProblemDataActions();
+  const processedUlds = useProcessedUlds();
 
   useEffect(() => {
     const loadAndSetFiles = async () => {
@@ -57,6 +61,9 @@ export default function DemoPages({ children }: DemoPagesProps) {
     loadAndSetFiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (processedUlds.length === 0)
+    return <div>There are no ULDs to display to the user.</div>;
 
   return <>{children}</>;
 }
