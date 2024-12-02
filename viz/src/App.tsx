@@ -20,6 +20,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/arena" element={<Arena />} />
         <Route path="/review" element={<DataReview />} />
+        <Route path="/load/:uldId" element={<AnimatedULD />} />
 
         {/* Demo paths for testing the components */}
         <Route path="/demo/viz" element={<UploadPackingData />} />
@@ -40,10 +41,10 @@ export default function App() {
           }
         />
         <Route
-          path="/demo/animate"
+          path="/demo/animate/:uldId"
           element={
             <DemoPages>
-              <AnimatedULD uldIndex={0} />
+              <AnimatedULD />
             </DemoPages>
           }
         />

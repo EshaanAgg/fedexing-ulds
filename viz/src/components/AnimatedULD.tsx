@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import { useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Button, Dialog, Flex, Group, Text } from '@mantine/core';
-import { CameraControls, Center, Edges } from '@react-three/drei';
+import { CameraControls, Edges } from '@react-three/drei';
 import {
   addCoordinates,
   getCenterCoordinates,
@@ -13,6 +13,7 @@ import Ground from './Ground';
 import AnimatedBox from './AnimatedBox';
 import { useProcessedUlds } from '../stores/problemDataStore';
 import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
+import { useParams } from 'react-router';
 
 interface AnimatedULDProps {
   uldData: ULDMeta;
@@ -58,18 +59,24 @@ const AnimatedULD = (props: AnimatedULDProps) => {
   );
 };
 
-interface AnimatedULDWrapperProps {
-  uldIndex: number;
-}
+export default function AnimatedULDWrapper() {
+  const { uldId } = useParams<string>();
 
-export default function AnimatedULDWrapper(props: AnimatedULDWrapperProps) {
+  if (!uldId)
+    return <Text size="lg">No ULD ID provided. Please provide a ULD ID</Text>;
+
   const timelineRef = useRef(
     gsap.timeline({
       paused: true,
     }),
   );
 
-  const uldData = useProcessedUlds()[props.uldIndex];
+  const uldData = useProcessedUlds().find((u) => u.id === uldId);
+  if (!uldData)
+    return (
+      <Text size="lg">No ULD found with ID {uldId}. Please try again</Text>
+    );
+
   const [playing, setPlaying] = useState(false);
 
   let lastPackagePosition = INTIAL_OFFSET_VECTOR;
@@ -117,13 +124,11 @@ export default function AnimatedULDWrapper(props: AnimatedULDWrapperProps) {
 
       <div style={{ width: '100vw', height: '100vh' }}>
         <Canvas shadows camera={{ position: [0, 5, 10], fov: 60 }}>
-          <Center top>
-            <AnimatedULD
-              timelineRef={timelineRef}
-              uldData={uldData}
-              packageConfig={packageConfig}
-            />
-          </Center>
+          <AnimatedULD
+            timelineRef={timelineRef}
+            uldData={uldData}
+            packageConfig={packageConfig}
+          />
 
           <Ground />
           <CameraControls makeDefault />
