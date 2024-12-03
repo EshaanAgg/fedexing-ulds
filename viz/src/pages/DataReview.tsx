@@ -1,3 +1,6 @@
+import axios from 'axios';
+import { useState } from 'react';
+import { notifications } from '@mantine/notifications';
 import {
   Card,
   Container,
@@ -10,26 +13,53 @@ import {
   Text,
 } from '@mantine/core';
 import { IconPackage, IconBoxMultiple, IconUpload } from '@tabler/icons-react';
-import PackageTable from '../components/PackageTable';
+
 import ULDTable from '../components/ULDTable';
-import { notifications } from '@mantine/notifications';
-import { useState } from 'react';
+import PackageTable from '../components/PackageTable';
+import type { PackingResult } from '../utils/dataConvert';
 import UploadDataInterface from '../components/CompatibilityUploads';
+import {
+  usePackages,
+  useProblemDataActions,
+  useUlds,
+} from '../stores/problemDataStore';
+import { useNavigate } from 'react-router';
+
+const iconStyle = { width: rem(12), height: rem(12) };
 
 function DataReview() {
   const [packageCompFile, setPackageCompFile] = useState<File | null>(null);
   const [uldCompFile, setUldCompFile] = useState<File | null>(null);
+  const navigate = useNavigate();
 
-  const iconStyle = { width: rem(12), height: rem(12) };
+  const ulds = useUlds();
+  const packages = usePackages();
+  const { setPackingResults, calculateProcessedUlds } = useProblemDataActions();
 
-  const handleSubmit = () => {
-    // TODO: Add actual generation of solution, setting the same in store, and navigate to arena
+  const handleSubmit = async () => {
     notifications.show({
       title: 'Generating solution!',
       color: 'yellow',
       message:
         'Please wait for a couple of minutes while we generate the solution for you!',
     });
+
+    const solutionData = await axios.post<PackingResult[]>(
+      '/api',
+      { packages, ulds },
+      { baseURL: import.meta.env.VITE_BACKEND_API_URL },
+    );
+
+    setPackingResults(solutionData.data);
+    calculateProcessedUlds();
+
+    notifications.show({
+      title: 'Solution generated!',
+      color: 'green',
+      message: 'The solution has been generated successfully!',
+    });
+
+    navigate('/arena');
   };
 
   return (
@@ -106,7 +136,15 @@ function DataReview() {
           </Grid.Col>
         </Grid>
 
-        <Button onClick={handleSubmit} mt="lg" w={512} color="orange">
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+          mt="lg"
+          w={512}
+          color="orange"
+        >
           Generate Solution
         </Button>
       </Flex>

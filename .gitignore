@@ -20,3 +20,4 @@ __pycache__
 *.rar
 
 app/target/
+server/sample_solution.csv

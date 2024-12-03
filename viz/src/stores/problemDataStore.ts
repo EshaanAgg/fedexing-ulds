@@ -1,12 +1,16 @@
 import { create } from 'zustand';
-import type { PackageData, ULDData, PackingResult } from '../utils/dataConvert';
+import {
+  type PackageData,
+  type ULDData,
+  type PackingResult,
+  getProcessedULDs,
+} from '../utils/dataConvert';
 
 interface ProblemDataState {
   packages: PackageData[];
   ulds: ULDData[];
   packingResults: PackingResult[];
   processedUlds: ULDMeta[];
-  dataAvailable: boolean;
 
   actions: {
     setProblemData: (data: {
@@ -15,6 +19,10 @@ interface ProblemDataState {
       packingResults: PackingResult[];
       processedUlds: ULDMeta[];
     }) => void;
+
+    setPackageAndUldData(packages: PackageData[], ulds: ULDData[]): void;
+    setPackingResults(packingResults: PackingResult[]): void;
+    calculateProcessedUlds(): void;
   };
 }
 
@@ -23,7 +31,6 @@ const useProblemDataStore = create<ProblemDataState>()((set) => ({
   ulds: [],
   packingResults: [],
   processedUlds: [],
-  dataAvailable: false,
 
   actions: {
     setProblemData: (data: {
@@ -37,16 +44,33 @@ const useProblemDataStore = create<ProblemDataState>()((set) => ({
         ulds: data.ulds,
         packingResults: data.packingResults,
         processedUlds: data.processedUlds,
-        dataAvailable: true,
       })),
+
+    setPackageAndUldData: (packages, ulds) =>
+      set(() => ({
+        packages,
+        ulds,
+      })),
+
+    setPackingResults: (packingResults) =>
+      set(() => ({
+        packingResults,
+      })),
+
+    calculateProcessedUlds: () => {
+      set((state) => ({
+        processedUlds: getProcessedULDs({
+          packages: state.packages,
+          ulds: state.ulds,
+          packingResults: state.packingResults,
+        }),
+      }));
+    },
   },
 }));
 
 export const useProblemDataActions = () =>
   useProblemDataStore((state) => state.actions);
-
-export const useProblemDataAvailable = () =>
-  useProblemDataStore((state) => state.dataAvailable);
 
 export const useProcessedUlds = () =>
   useProblemDataStore((state) => state.processedUlds);

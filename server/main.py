@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-
+from solution import generate_solution, Request as SolutionRequest
 from metrics_handler import (
     moi_metric,
     Request as MetricsRequest,
@@ -21,6 +21,11 @@ app.add_middleware(
 @app.get("/")
 def health_check():
     return {"status": "ok"}
+
+
+@app.post("/api")
+def get_solution(request: SolutionRequest):
+    return generate_solution(request)
 
 
 @app.post("/api/metrics")

@@ -13,13 +13,9 @@ import {
   Flex,
 } from '@mantine/core';
 
-import {
-  getProcessedULDs,
-  PackageDataSchema,
-  ULDDataSchema,
-} from '../utils/dataConvert';
+import { PackageDataSchema, ULDDataSchema } from '../utils/dataConvert';
 import { useProblemDataActions } from '../stores/problemDataStore';
-import type { ULDData, PackageData, PackingResult } from '../utils/dataConvert';
+import type { ULDData, PackageData } from '../utils/dataConvert';
 import { parseCSV } from '../utils/parse';
 
 function DropzoneUploadedFile({
@@ -47,7 +43,7 @@ function DropzoneUploadedFile({
 }
 
 function Home() {
-  const { setProblemData } = useProblemDataActions();
+  const { setPackageAndUldData } = useProblemDataActions();
   const navigate = useNavigate();
 
   const [uldFile, setUldFile] = useState<File | null>(null);
@@ -87,16 +83,8 @@ function Home() {
         parseCSV<ULDData>(uldFile, ULDDataSchema),
         parseCSV<PackageData>(packageFile, PackageDataSchema),
       ]);
+      setPackageAndUldData(packages, ulds);
 
-      // TODO: Add logic to generate the actual packing results
-      const packingResults: PackingResult[] = [];
-
-      setProblemData({
-        ulds,
-        packages,
-        packingResults,
-        processedUlds: getProcessedULDs({ ulds, packages, packingResults }),
-      });
       notifications.show({
         title: 'Files processed!',
         message: 'The files have been processed successfully!',

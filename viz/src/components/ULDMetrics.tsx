@@ -74,12 +74,14 @@ const ULDMetrics = (props: ULD) => {
 
   return (
     <Table highlightOnHover withTableBorder>
-      {dataToDisplay.map((item) => (
-        <Table.Tr key={item.label}>
-          <Table.Td>{item.label}</Table.Td>
-          <Table.Td>{item.val}</Table.Td>
-        </Table.Tr>
-      ))}
+      <Table.Tbody>
+        {dataToDisplay.map((item) => (
+          <Table.Tr key={item.label}>
+            <Table.Td>{item.label}</Table.Td>
+            <Table.Td>{item.val}</Table.Td>
+          </Table.Tr>
+        ))}
+      </Table.Tbody>
     </Table>
   );
 };

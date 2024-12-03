@@ -106,10 +106,15 @@ def moi_metric(req: Request) -> float:
 
 
 def used_space(req: Request) -> float:
+    if req.uld_height == 0 or req.uld_width == 0 or req.uld_length == 0:
+        return 0
+
     return sum(pkg.volume for pkg in req.packages) / (
         req.uld_length * req.uld_width * req.uld_height
     )
 
 
 def used_weight(req: Request) -> float:
+    if req.uld_weight == 0:
+        return 0
     return sum(pkg.weight for pkg in req.packages) / req.uld_weight

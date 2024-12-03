@@ -122,7 +122,7 @@ export default function AnimatedULDWrapper() {
         </Group>
       </Dialog>
 
-      <div style={{ width: '100vw', height: '100vh' }}>
+      <div style={{ width: '100vw', height: '90vh' }}>
         <Canvas shadows camera={{ position: [0, 5, 10], fov: 60 }}>
           <AnimatedULD
             timelineRef={timelineRef}
