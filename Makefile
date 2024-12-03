@@ -8,3 +8,6 @@ run-java:
 	python utils.py data/raw_java_choco.csv data/java_choco.csv
 	python validator.py data/java_choco.csv
 
+start:
+	cd viz && npm run dev &
+	cd server && uvicorn main:app --reload

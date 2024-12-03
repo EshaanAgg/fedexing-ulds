@@ -183,7 +183,12 @@ export const getOrientation = (orgDim: Vector, rotatedDim: Vector): string => {
   ];
 
   for (const orientation of orientations)
-    if (orientation.dims === rotatedDim) return orientation.label;
+    if (
+      orientation.dims[0] === rotatedDim[0] &&
+      orientation.dims[1] === rotatedDim[1] &&
+      orientation.dims[2] === rotatedDim[2]
+    )
+      return orientation.label;
 
   return 'Unknown Orientation';
 };
@@ -196,8 +201,8 @@ export const getLoadingPlan = (
   const headers = ['S. No.', 'Package ID', 'R1', 'R2', 'Orientation'];
   const data: string[][] = [];
 
-  const solRow = solnData.filter((row) => row.uld_id === uldID);
-  solRow.forEach((row, index) => {
+  const solRows = solnData.filter((row) => row.uld_id === uldID);
+  solRows.forEach((row, index) => {
     const orgPkg = pkgData.find((pkg) => pkg.id === row.pack_id);
     if (!orgPkg)
       throw new Error(
