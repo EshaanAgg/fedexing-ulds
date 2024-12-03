@@ -53,3 +53,5 @@ export const useProcessedUlds = () =>
 
 export const usePackages = () => useProblemDataStore((state) => state.packages);
 export const useUlds = () => useProblemDataStore((state) => state.ulds);
+export const usePackingResults = () =>
+  useProblemDataStore((state) => state.packingResults);

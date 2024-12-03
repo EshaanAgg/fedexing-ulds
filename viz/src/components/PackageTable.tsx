@@ -60,9 +60,9 @@ const ExpandedRow = (props: ExpandedRowProps) => {
       <Grid.Col span={6}>
         <MultiSelect
           checkIconPosition="right"
-          data={['XY[1]', 'XY[2]', 'YZ[1]', 'YZ[2]', 'XZ[1]', 'XZ[2]']}
+          data={['XY', 'YZ', 'XZ']}
           searchable
-          label="Cannot be stacked on"
+          label="Cannot be stacked on faces"
           value={unstackableFaces}
           onChange={(value) =>
             actions.setUnstackableFaces(props.data.id, value)

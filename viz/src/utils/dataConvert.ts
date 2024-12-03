@@ -153,3 +153,68 @@ export const shiftCoordinates = (ULDs: ULDMeta[]): ULDMeta[] => {
     })),
   }));
 };
+
+export const getOrientation = (orgDim: Vector, rotatedDim: Vector): string => {
+  const orientations = [
+    {
+      label: 'XYZ',
+      dims: [orgDim[0], orgDim[1], orgDim[2]],
+    },
+    {
+      label: 'XZY',
+      dims: [orgDim[0], orgDim[2], orgDim[1]],
+    },
+    {
+      label: 'YXZ',
+      dims: [orgDim[1], orgDim[0], orgDim[2]],
+    },
+    {
+      label: 'YZX',
+      dims: [orgDim[1], orgDim[2], orgDim[0]],
+    },
+    {
+      label: 'ZXY',
+      dims: [orgDim[2], orgDim[0], orgDim[1]],
+    },
+    {
+      label: 'ZYX',
+      dims: [orgDim[2], orgDim[1], orgDim[0]],
+    },
+  ];
+
+  for (const orientation of orientations)
+    if (orientation.dims === rotatedDim) return orientation.label;
+
+  return 'Unknown Orientation';
+};
+
+export const getLoadingPlan = (
+  uldID: string,
+  solnData: PackingResult[],
+  pkgData: PackageData[],
+) => {
+  const headers = ['S. No.', 'Package ID', 'R1', 'R2', 'Orientation'];
+  const data: string[][] = [];
+
+  const solRow = solnData.filter((row) => row.uld_id === uldID);
+  solRow.forEach((row, index) => {
+    const orgPkg = pkgData.find((pkg) => pkg.id === row.pack_id);
+    if (!orgPkg)
+      throw new Error(
+        `Package with ID ${row.pack_id} not found in the request.`,
+      );
+
+    data.push([
+      (index + 1).toString(),
+      row.pack_id,
+      `(${row.x1}, ${row.y1}, ${row.z1})`,
+      `(${row.x2}, ${row.y2}, ${row.z2})`,
+      getOrientation(
+        [orgPkg.length, orgPkg.width, orgPkg.height],
+        [row.x2 - row.x1, row.y2 - row.y1, row.z2 - row.z1],
+      ),
+    ]);
+  });
+
+  return { headers, data };
+};

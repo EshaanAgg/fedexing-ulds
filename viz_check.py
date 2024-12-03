@@ -1,16 +1,33 @@
+import sys
 import pandas as pd
 from typing import Optional
 from itertools import permutations
 
 
-# Checks if the provided intervals [l1, r1] and [l2, r2] intersect
+def load_dfs(
+    package_file: str = "./packages_viz.csv",
+    uld_file: str = "./ulds_viz.csv",
+):
+    uld_data = pd.read_csv(
+        uld_file,
+        header=0,
+        names=["id", "length", "width", "height", "weight"],
+    )
+
+    package_data = pd.read_csv(
+        package_file,
+        header=0,
+        names=["id", "length", "width", "height", "weight", "priority", "cost"],
+    )
+
+    return package_data, uld_data
+
+
 def interval_intersection(l1: int, r1: int, l2: int, r2: int) -> bool:
     return not (r1 <= l2 or r2 <= l1)
 
 
 class Cuboid:
-    # (x1, y1, z1) is the corner with smallest z, and then y, and then x
-    # (x2, y2, z2) is the diagonally opposite corner
     def __init__(self, x1, y1, z1, x2, y2, z2):
         assert x1 < x2, f"x1 must be less than x2, got {x1} and {x2}"
         assert y1 < y2, f"y1 must be less than y2, got {y1} and {y2}"
@@ -30,7 +47,6 @@ class Cuboid:
     def volume(self) -> int:
         return self.length * self.width * self.height
 
-    # Returns the intersection of two cuboids, or None if they don't intersect
     def intersection(self, other: "Cuboid") -> Optional["Cuboid"]:
         x1 = max(self.x1, other.x1)
         y1 = max(self.y1, other.y1)
@@ -44,11 +60,9 @@ class Cuboid:
 
         return Cuboid(x1, y1, z1, x2, y2, z2)
 
-    # Returns True if the two cuboids intersect
     def intersects(self, other: "Cuboid") -> bool:
         return self.intersection(other) is not None
 
-    # Returns True if this cuboid is contained in the other cuboid
     def contained_in(self, other: "Cuboid") -> bool:
         return (
             self.x2 <= other.x2
@@ -59,7 +73,6 @@ class Cuboid:
             and self.z1 >= other.z1
         )
 
-    # Checks if this cuboid is on top of other
     def on_top_of(self, other: "Cuboid") -> bool:
         return (
             self.z1 == other.z2
@@ -75,9 +88,6 @@ class Package(Cuboid):
         self.weight = weight
         self.is_priority = is_priority
         self.cost = cost
-
-    def __repr__(self):
-        return f"Package({self.x1}, {self.y1}, {self.z1}, {self.x2}, {self.y2}, {self.z2}, {self.weight})"
 
     def validate_against_dimensions(self, l, w, h):
         for dim in permutations([l, w, h]):
@@ -105,17 +115,13 @@ class ULD(Cuboid):
         if package.is_priority:
             self.has_priority = True
 
-    # Validates that the ULD is valid
-    # Throws a ValueError if the ULD is invalid
     def validate(self, use_spatial_validation=False):
-        # Weight validation
         total_weight = sum(package.weight for package in self.containing_packages)
         if total_weight > self.capacity:
             raise ValueError(
                 f"Total weight of packages in ULD {self.id} exceeds capacity"
             )
 
-        # Intersection Validation
         for package in self.containing_packages:
             for other_package in self.containing_packages:
                 if package.id != other_package.id and package.intersects(other_package):
@@ -123,17 +129,14 @@ class ULD(Cuboid):
                         f"Package {package.id} intersects with package {other_package.id}"
                     )
 
-        # Boundary Validation
         for package in self.containing_packages:
             if not package.contained_in(self):
                 raise ValueError(
                     f"Package {package.id} is not contained in ULD {self.id}"
                 )
 
-        # Spatial Validation
         if use_spatial_validation:
             for package in self.containing_packages:
-                # Check if the package is on top of another package or on the ground
                 is_on_top = False
                 for other_package in self.containing_packages:
                     if package.id != other_package.id and package.on_top_of(
@@ -147,22 +150,14 @@ class ULD(Cuboid):
                     )
 
 
-# Validates the solution given the ULD, packages, and solution CSV files
 def validate_solution(
     solution_path: str,
-    uld_path: str = "./data/ulds.csv",
-    packages_path: str = "./data/packages.csv",
     use_spatial_validation=False,
     diff_package_cost: int = 5000,
     check_all_packages: bool = True,
     has_header: bool = True,
 ):
-    # Load the ULD data
-    uld_df = pd.read_csv(
-        uld_path,
-        header=0,
-        names=["id", "length", "width", "height", "limit"],
-    )
+    package_data, uld_df = load_dfs()
 
     uld_ids = set()
     ulds = []
@@ -173,25 +168,11 @@ def validate_solution(
             rv["length"],
             rv["width"],
             rv["height"],
-            rv["limit"],
+            rv["weight"],
         )
         ulds.append(uld)
         uld_ids.add(uld.id)
 
-    # Load the package data
-    package_data = pd.read_csv(
-        packages_path,
-        header=0,
-        names=["id", "length", "width", "height", "weight", "priority", "cost"],
-    )
-    package_data["priority"] = package_data["priority"].apply(
-        lambda x: 1 if x == "Priority" else 0
-    )
-    package_data["cost"] = package_data["cost"].apply(
-        lambda x: 0 if x == "-" else int(x)
-    )
-
-    # Validate the solution
     if has_header:
         with open(solution_path) as file:
             data_lines = file.readlines()
@@ -236,7 +217,6 @@ def validate_solution(
         ), f"The number of packed packages does not match the reported number of packages"
         number_packages = len(packed_packages)
 
-    # Check that the non-null ULDs are valid
     count_packed = 0
     for row in solution_data.iterrows():
         uld = row[1]["uld_id"]
@@ -244,7 +224,6 @@ def validate_solution(
             assert uld in uld_ids, f"ULD {uld} not found in ULD data"
             count_packed += 1
         else:
-            # Check that all the coordinates are -1
             for coord in ["x1", "y1", "z1", "x2", "y2", "z2"]:
                 assert (
                     row[1][coord] == -1
@@ -312,7 +291,76 @@ def validate_solution(
     )
 
 
+def generate_solution_file(
+    raw_file: str,
+    output_file: str,
+    priority_spread_cost: int = 5000,
+):
+    df = pd.read_csv(
+        raw_file,
+        names=["uld_id", "pack_id", "x1", "y1", "z1", "x2", "y2", "z2"],
+    )
+
+    package_data, _ = load_dfs()
+
+    solution_data = []
+    left_cost = 0
+    priority_ulds = set()
+    number_packages = 0
+
+    for _, pack in package_data.iterrows():
+        solution_row = df[df["pack_id"] == pack["id"]]
+
+        if solution_row.empty:
+            solution_df = solution_df._append(
+                {
+                    "package_id": pack["id"],
+                    "uld_id": "NONE",
+                    "x1": -1,
+                    "y1": -1,
+                    "z1": -1,
+                    "x2": -1,
+                    "y2": -1,
+                    "z2": -1,
+                },
+                ignore_index=True,
+            )
+
+            left_cost += pack["cost"]
+        else:
+            solution_data.append(
+                {
+                    "package_id": pack["id"],
+                    "uld_id": solution_row["uld_id"].values[0],
+                    "x1": solution_row["x1"].values[0],
+                    "y1": solution_row["y1"].values[0],
+                    "z1": solution_row["z1"].values[0],
+                    "x2": solution_row["x2"].values[0],
+                    "y2": solution_row["y2"].values[0],
+                    "z2": solution_row["z2"].values[0],
+                }
+            )
+
+            number_packages += 1
+            if pack["priority"]:
+                priority_ulds.add(solution_row["uld_id"].values[0])
+
+    left_cost += len(priority_ulds) * priority_spread_cost
+
+    with open(output_file, "w") as file:
+        file.write(f"{int(left_cost)} {number_packages} {len(priority_ulds)}\n")
+        solution_df.to_csv(
+            file,
+            index=False,
+            header=False,
+        )
+
+
 if __name__ == "__main__":
-    # outfile = sys.argv[1]
-    # validate_solution(outfile)
-    validate_solution("./output.csv", has_header=False, check_all_packages=False)
+    inp_file = sys.argv[1]
+    inp_file_name = inp_file.split("/")[-1].split(".")[0]
+    inp_file_path = inp_file.split(inp_file_name)[0]
+
+    solution_file = f"{inp_file_path}{inp_file_name}_solution.csv"
+    generate_solution_file(inp_file, solution_file)
+    validate_solution(solution_file)

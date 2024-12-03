@@ -23,6 +23,8 @@
     "@tabler/icons-react": "^3.22.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "leva": "^0.9.35",
     "mantine-react-table": "^2.0.0-beta.7",
     "papaparse": "^5.4.1",

@@ -66,6 +66,7 @@ def generate_solution_file(
     package_file: str = "./data/packages.csv",
     uld_file: str = "./data/ulds.csv",
     priority_spread_cost: int = 5000,
+    one_based_idx: bool = False,
 ):
     """
     Generates a CSV file in the solution format from the given raw solution file.
@@ -84,13 +85,16 @@ def generate_solution_file(
     """
     df = pd.read_csv(
         raw_file,
-        header=0,
         names=["uld_idx", "package_idx", "x", "y", "z"],
     )
 
     package_data, uld_data = load_dfs(package_file, uld_file)
     package_data.rename(columns={"id": "package_id"}, inplace=True)
     uld_data.rename(columns={"id": "uld_id"}, inplace=True)
+
+    if one_based_idx:
+        df["uld_idx"] -= 1
+        df["package_idx"] -= 1
 
     solution_df = pd.DataFrame(
         columns=["package_id", "uld_id", "x1", "y1", "z1", "x2", "y2", "z2"]
@@ -155,4 +159,12 @@ if __name__ == "__main__":
     raw_file = args[0]
     output_file = args[1]
 
-    generate_solution_file(raw_file, output_file)
+    one_based_idx = False
+    if len(args) > 2 and args[2] == "one_based":
+        one_based_idx = True
+
+    generate_solution_file(
+        raw_file,
+        output_file,
+        one_based_idx=one_based_idx,
+    )
