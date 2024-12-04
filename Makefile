@@ -10,4 +10,4 @@ run-java:
 
 start:
 	cd viz && npm run dev &
-	conda activate fedex && cd server && uvicorn main:app --reload
+ 	conda activate fedex && cd server && uvicorn main:app --reload
