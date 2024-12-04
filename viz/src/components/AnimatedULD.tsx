@@ -12,7 +12,11 @@ import {
 import Ground from './Ground';
 import AnimatedBox from './AnimatedBox';
 import { useProcessedUlds } from '../stores/problemDataStore';
-import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
+import {
+  IconPlayerPause,
+  IconPlayerPlay,
+  IconProgressCheck,
+} from '@tabler/icons-react';
 import { useParams } from 'react-router';
 
 interface AnimatedULDProps {
@@ -28,6 +32,8 @@ type PackageConfig = {
 };
 
 const INTIAL_OFFSET_VECTOR = [7, 1, -3] as Vector;
+const SINGLE_ANIMATION_DURATION = 0.5;
+const SINGLE_ANIMATION_DELAY = 0.25;
 
 const AnimatedULD = (props: AnimatedULDProps) => {
   const uldData = props.uldData;
@@ -50,13 +56,36 @@ const AnimatedULD = (props: AnimatedULDProps) => {
           finalPos={props.packageConfig[index].finalPos}
           color={props.packageConfig[index].color}
           label={box.id}
-          delay={0.5}
-          animationDuration={1}
+          delay={SINGLE_ANIMATION_DELAY}
+          animationDuration={SINGLE_ANIMATION_DURATION}
           timeline={props.timelineRef.current}
         />
       ))}
     </group>
   );
+};
+
+type PlayingState = 'false' | 'true' | 'completed';
+
+const getPlayButton = (playing: PlayingState) => {
+  if (playing === 'true') {
+    return (
+      <>
+        <IconPlayerPause /> <Text ml="md">Pause</Text>
+      </>
+    );
+  } else if (playing == 'false') {
+    return (
+      <>
+        <IconPlayerPlay /> <Text ml="md">Play</Text>
+      </>
+    );
+  } else
+    return (
+      <>
+        <IconProgressCheck color="grey" /> <Text ml="md">Completed</Text>
+      </>
+    );
 };
 
 export default function AnimatedULDWrapper() {
@@ -77,7 +106,11 @@ export default function AnimatedULDWrapper() {
       <Text size="lg">No ULD found with ID {uldId}. Please try again</Text>
     );
 
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState<PlayingState>('false');
+
+  timelineRef.current.eventCallback('onComplete', () => {
+    setPlaying('completed');
+  });
 
   let lastPackagePosition = INTIAL_OFFSET_VECTOR;
   const packageConfig = uldData.packages.map((p) => {
@@ -98,25 +131,22 @@ export default function AnimatedULDWrapper() {
 
   return (
     <>
-      <Dialog opened style={{ maxWidth: '180px', background: 'lightgrey' }}>
+      <Dialog opened style={{ maxWidth: '200px' }} withBorder>
         <Group justify="center">
           <Button
             onClick={() => {
-              if (playing) timelineRef.current.pause();
-              else timelineRef.current.play();
-              setPlaying(!playing);
+              if (playing === 'true') {
+                timelineRef.current.pause();
+                setPlaying('false');
+              } else {
+                timelineRef.current.play();
+                setPlaying('true');
+              }
             }}
+            disabled={playing === 'completed'}
           >
             <Flex justify="center" direction="row" align="center">
-              {playing ? (
-                <>
-                  <IconPlayerPause /> <Text ml="md">Pause</Text>
-                </>
-              ) : (
-                <>
-                  <IconPlayerPlay /> <Text ml="md">Play </Text>
-                </>
-              )}
+              {getPlayButton(playing)}
             </Flex>
           </Button>
         </Group>

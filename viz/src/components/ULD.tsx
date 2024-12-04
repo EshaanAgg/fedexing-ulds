@@ -7,6 +7,8 @@ interface ULDProps {
   uld: ULDMeta;
 }
 
+const ULD_LABEL_OFFSET = 0.4;
+
 export const ULD = (props: ULDProps) => {
   const uldData = props.uld;
   const { activateUld } = useActiveUldActions();
@@ -20,11 +22,11 @@ export const ULD = (props: ULDProps) => {
         <Edges visible scale={1.01} color="black" />
         <Billboard>
           <Text
-            fontSize={0.2}
+            fontSize={0.3}
             color="black"
             anchorX="center"
             anchorY="middle"
-            position={[0, 0, 0]}
+            position={[0, uldData.size[1] / 2 + ULD_LABEL_OFFSET, 0]}
           >
             {uldData.id} ({uldData.packages.length})
           </Text>

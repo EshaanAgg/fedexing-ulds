@@ -118,3 +118,66 @@ def used_weight(req: Request) -> float:
     if req.uld_weight == 0:
         return 0
     return sum(pkg.weight for pkg in req.packages) / req.uld_weight
+
+
+def stability(req: Request):
+    if len(req.packages) == 0:
+        return 0
+
+    base_support_area = 0
+    center_of_gravity_height = 0
+    stacking_stability = 0
+    weighted_x_sum = 0
+    weighted_y_sum = 0
+
+    total_weight = sum(pkg.weight for pkg in req.packages)
+
+    for pkg in req.packages:
+        mx_base_area = max(
+            pkg.length * pkg.width,
+            pkg.length * pkg.height,
+            pkg.width * pkg.height,
+        )
+        base_support_area += pkg.length * pkg.width / mx_base_area
+
+        center_of_gravity_height += (
+            (pkg.z1 + pkg.z2) / 2 / req.uld_height * (pkg.weight / total_weight)
+        )
+
+        weighted_x_sum += pkg.center.x * pkg.weight
+        weighted_y_sum += pkg.center.y * pkg.weight
+
+    # Stacking stability: penalize heavier packages on lighter ones
+    for pkg in req.packages:
+        below_packages = [
+            other
+            for other in req.packages
+            if (
+                other.x1 < pkg.x2
+                and other.x2 > pkg.x1
+                and other.y1 < pkg.y2
+                and other.y2 > pkg.y1
+                and other.z2 <= pkg.z1
+            )
+        ]
+        stacked_weight = sum(other.weight for other in below_packages)
+        stacking_stability += 1 if stacked_weight >= pkg.weight else 0
+
+    base_support_area /= len(req.packages)
+    stacking_stability /= len(req.packages)
+
+    center_x = weighted_x_sum / total_weight
+    center_y = weighted_y_sum / total_weight
+    deviation_from_center = (
+        (center_x - req.uld_length / 2) ** 2 + (center_y - req.uld_width / 2) ** 2
+    ) ** 0.5
+    placement_distribution = 1 - (
+        deviation_from_center / ((req.uld_length + req.uld_width) / 4)
+    )
+
+    return (
+        0.2 * base_support_area
+        + 0.2 * (1 - center_of_gravity_height)
+        + 0.5 * placement_distribution
+        + 0.1 * stacking_stability
+    ) + 0.08

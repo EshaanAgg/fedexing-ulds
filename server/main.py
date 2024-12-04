@@ -7,6 +7,7 @@ from metrics_handler import (
     Request as MetricsRequest,
     used_space,
     used_weight,
+    stability,
 )
 
 app = FastAPI()
@@ -35,4 +36,5 @@ def get_metrics(request: MetricsRequest):
         "count": len(request.packages),
         "utilization": used_space(request),
         "weight_utilization": used_weight(request),
+        "stability": stability(request),
     }

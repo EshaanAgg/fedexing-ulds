@@ -37,7 +37,7 @@ export default function AnimatedBox(props: Props) {
       <meshStandardMaterial color={props.color} transparent opacity={0.5} />
       <Edges scale={1.0} color="black" />
       <Billboard>
-        <Text fontSize={0.15} color="black">
+        <Text fontSize={0.12} color="black">
           {props.label}
         </Text>
       </Billboard>

@@ -24,6 +24,7 @@ interface Metrics {
   moi: number;
   utilization: number;
   weight_utilization: number;
+  stability: number;
 }
 
 const ULDMetrics = (props: ULD) => {
@@ -36,6 +37,7 @@ const ULDMetrics = (props: ULD) => {
           moi: 0,
           utilization: 0,
           weight_utilization: 0,
+          stability: 0,
         };
 
       const response = await axios.post<Metrics>(
@@ -69,6 +71,10 @@ const ULDMetrics = (props: ULD) => {
     {
       label: 'Weight Utilization',
       val: `${((data?.weight_utilization ?? 0) * 100).toFixed(2)} %`,
+    },
+    {
+      label: 'Physical Stability',
+      val: data?.stability.toFixed(3),
     },
   ];
 
