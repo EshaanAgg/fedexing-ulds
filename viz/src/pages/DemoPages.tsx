@@ -25,7 +25,6 @@ const fetchAndParseCSV = async <T,>(url: string): Promise<T[]> => {
 
 // Change the function to accept a childreb for the Arena component
 // and return a new component that loads the sample data
-
 interface DemoPagesProps {
   children: React.ReactNode;
 }

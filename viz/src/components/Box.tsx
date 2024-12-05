@@ -7,16 +7,31 @@ interface Box {
   size: [number, number, number];
   id: string;
   label?: string;
+  priority: boolean;
+  mode: string;
 }
+
+const getIsVisible = (mode: string, isPriority: boolean) => {
+  if (mode === 'All') {
+    return true;
+  } else if (mode === 'Priority') {
+    return isPriority;
+  } else {
+    return !isPriority;
+  }
+};
 
 const OFFSET_VECTOR = [0.001, 0.001, 0.001] as Vector;
 
 function Box(props: Box) {
   return (
     // Add the offset to prevent z-fighting
-    <mesh position={addCoordinates(OFFSET_VECTOR, props.center)}>
+    <mesh
+      position={addCoordinates(OFFSET_VECTOR, props.center)}
+      visible={getIsVisible(props.mode, props.priority)}
+    >
       <boxGeometry args={props.size} />
-      <meshStandardMaterial color={props.color} transparent opacity={0.5} />
+      <meshStandardMaterial color={props.color} opacity={0.75} />
 
       {/* 3D Label */}
       {props.label && (
@@ -33,7 +48,7 @@ function Box(props: Box) {
         </Billboard>
       )}
 
-      <Edges scale={1.0} color="black" />
+      <Edges scale={0.99} color="black" lineWidth={1} />
     </mesh>
   );
 }

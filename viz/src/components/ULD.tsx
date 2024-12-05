@@ -5,6 +5,7 @@ import { useActiveUldActions } from '../stores/activeUldStore';
 
 interface ULDProps {
   uld: ULDMeta;
+  mode: string;
 }
 
 const ULD_LABEL_OFFSET = 0.4;
@@ -44,6 +45,8 @@ export const ULD = (props: ULDProps) => {
           size={box.size}
           color={box.color}
           id={box.id}
+          priority={box.priority}
+          mode={props.mode}
         />
       ))}
     </group>

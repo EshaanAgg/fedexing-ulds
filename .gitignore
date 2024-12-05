@@ -2,7 +2,7 @@ pre-screen/*.csv
 pre-screen/*.zip
 
 .venv/
-data/
+./data/**
 __pycache__
 
 *.class
@@ -20,4 +20,3 @@ __pycache__
 *.rar
 
 app/target/
-server/sample_solution.csv

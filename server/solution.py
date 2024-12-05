@@ -35,7 +35,7 @@ class Request(BaseModel):
 
 
 def get_cached_solution():
-    df = pd.read_csv("sample_solution.csv")
+    df = pd.read_csv("./data/sample_solution.csv")
     return df.to_dict(orient="records")
 
 

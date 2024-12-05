@@ -6,7 +6,7 @@ import classes from './Header.module.css';
 import { useNavigate } from 'react-router';
 
 const links = [
-  { link: '/ship', label: 'Shippinng' },
+  { link: '/ship', label: 'Shipping' },
   { link: '/pricing', label: 'Pricing' },
   { link: '/dashboard', label: 'Dashboard' },
 ];

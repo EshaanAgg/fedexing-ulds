@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { useRef } from 'react';
 import { Text } from '@mantine/core';
-import { useControls, button, buttonGroup } from 'leva';
+import { useControls, button, buttonGroup, folder } from 'leva';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Center,
@@ -26,46 +26,51 @@ function Scene(props: SceneProps) {
   const { camera } = useThree();
 
   // Camera controls from the hovering menu
-  useControls(
-    'General',
-    {
-      thetaGrp: buttonGroup({
-        label: 'Rotate Theta',
-        opts: {
-          '-90º': () =>
-            cameraControlsRef.current.rotate(-90 * DEG2RAD, 0, true),
-          '-45º': () =>
-            cameraControlsRef.current.rotate(-45 * DEG2RAD, 0, true),
-          '+45º': () => cameraControlsRef.current.rotate(45 * DEG2RAD, 0, true),
-          '+90º': () => cameraControlsRef.current.rotate(90 * DEG2RAD, 0, true),
-        },
-      }),
-      phiGrp: buttonGroup({
-        label: 'Rotate Phi',
-        opts: {
-          '-20º': () => cameraControlsRef.current.rotate(0, 20 * DEG2RAD, true),
-          '+20º': () =>
-            cameraControlsRef.current.rotate(0, -20 * DEG2RAD, true),
-        },
-      }),
-      translateGrp: buttonGroup({
-        label: 'Height',
-        opts: {
-          Up: () => cameraControlsRef.current.truck(0, -1, true),
-          Down: () => cameraControlsRef.current.truck(0, 1, true),
-        },
-      }),
-      zoomGrp: buttonGroup({
-        label: 'Zoom',
-        opts: {
-          Close: () => cameraControlsRef.current.zoom(camera.zoom / 2, true),
-          Far: () => cameraControlsRef.current.zoom(-camera.zoom / 2, true),
-        },
-      }),
-      Reset: button(() => cameraControlsRef.current.reset(true)),
+  const { mode } = useControls({
+    mode: {
+      label: 'View Mode',
+      value: 'All',
+      options: ['All', 'Priority', 'Economy'],
     },
-    { collapsed: true },
-  );
+    'Camera Controls': folder(
+      {
+        thetaGrp: buttonGroup({
+          label: 'Rotate Theta',
+          opts: {
+            '-45º': () =>
+              cameraControlsRef.current.rotate(-45 * DEG2RAD, 0, true),
+            '+45º': () =>
+              cameraControlsRef.current.rotate(45 * DEG2RAD, 0, true),
+          },
+        }),
+        phiGrp: buttonGroup({
+          label: 'Rotate Phi',
+          opts: {
+            '-20º': () =>
+              cameraControlsRef.current.rotate(0, 20 * DEG2RAD, true),
+            '+20º': () =>
+              cameraControlsRef.current.rotate(0, -20 * DEG2RAD, true),
+          },
+        }),
+        translateGrp: buttonGroup({
+          label: 'Height',
+          opts: {
+            Up: () => cameraControlsRef.current.truck(0, -1, true),
+            Down: () => cameraControlsRef.current.truck(0, 1, true),
+          },
+        }),
+        zoomGrp: buttonGroup({
+          label: 'Zoom',
+          opts: {
+            Close: () => cameraControlsRef.current.zoom(camera.zoom / 2, true),
+            Far: () => cameraControlsRef.current.zoom(-camera.zoom / 2, true),
+          },
+        }),
+        Reset: button(() => cameraControlsRef.current.reset(true)),
+      },
+      { collapsed: true },
+    ),
+  });
 
   // Keyboard controls for the camera
   const [, get] = useKeyboardControls();
@@ -86,7 +91,7 @@ function Scene(props: SceneProps) {
         <Center top>
           <mesh>
             {props.uldData.map((uld, index) => (
-              <ULD key={index} uld={uld} />
+              <ULD key={index} uld={uld} mode={mode} />
             ))}
           </mesh>
         </Center>
@@ -109,7 +114,7 @@ function Arena() {
 
   return (
     <div style={{ width: '100vw', height: '90vh' }}>
-      <Canvas shadows camera={{ position: [0, 5, 10], fov: 60 }}>
+      <Canvas shadows camera={{ position: [0, 8, 18], fov: 60 }}>
         <KeyboardControls
           map={[
             { name: 'forward', keys: ['ArrowUp', 'w', 'W'] },

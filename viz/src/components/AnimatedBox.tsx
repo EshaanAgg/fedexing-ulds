@@ -34,8 +34,8 @@ export default function AnimatedBox(props: Props) {
   return (
     <mesh position={props.initialPos} ref={ref}>
       <boxGeometry args={props.size} />
-      <meshStandardMaterial color={props.color} transparent opacity={0.5} />
-      <Edges scale={1.0} color="black" />
+      <meshStandardMaterial color={props.color} opacity={0.75} />
+      <Edges scale={0.99} color="black" />
       <Billboard>
         <Text fontSize={0.12} color="black">
           {props.label}

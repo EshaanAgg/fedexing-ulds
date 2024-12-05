@@ -17,7 +17,7 @@ import {
   IconPlayerPlay,
   IconProgressCheck,
 } from '@tabler/icons-react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 interface AnimatedULDProps {
   uldData: ULDMeta;
@@ -90,6 +90,7 @@ const getPlayButton = (playing: PlayingState) => {
 
 export default function AnimatedULDWrapper() {
   const { uldId } = useParams<string>();
+  const navigate = useNavigate();
 
   if (!uldId)
     return <Text size="lg">No ULD ID provided. Please provide a ULD ID</Text>;
@@ -115,7 +116,7 @@ export default function AnimatedULDWrapper() {
   let lastPackagePosition = INTIAL_OFFSET_VECTOR;
   const packageConfig = uldData.packages.map((p) => {
     const config = {
-      initialPos: lastPackagePosition,
+      initialPos: getCenterCoordinates(lastPackagePosition, p.size),
       finalPos: getCenterCoordinates(p.position, p.size),
       color: p.color,
     } as PackageConfig;
@@ -147,6 +148,21 @@ export default function AnimatedULDWrapper() {
           >
             <Flex justify="center" direction="row" align="center">
               {getPlayButton(playing)}
+            </Flex>
+          </Button>
+        </Group>
+      </Dialog>
+
+      <Dialog
+        opened
+        style={{ maxWidth: '200px' }}
+        withBorder
+        position={{ left: 30, bottom: 30 }}
+      >
+        <Group justify="center">
+          <Button onClick={() => navigate('/arena')}>
+            <Flex justify="center" direction="row" align="center">
+              <Text>Back to Arena</Text>
             </Flex>
           </Button>
         </Group>

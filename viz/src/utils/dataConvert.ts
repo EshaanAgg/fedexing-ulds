@@ -80,14 +80,16 @@ export const getProcessedULDs = (
       weight: packageData.weight,
       priority: packageData.priority,
       cost: packageData.cost,
-      color: randomColor(),
+      color: randomColor({ luminosity: 'light' }),
     });
   }
+
+  ULDs.sort((a, b) => a.id.localeCompare(b.id));
 
   // Change the ULD positions to be non-overlapping
   // Z = 0 for all, and group the ULDs in multiple rows of rowItems ULD each
   const padding = 300,
-    rowItems = 3;
+    rowItems = 2;
 
   let lastY = 0;
 
