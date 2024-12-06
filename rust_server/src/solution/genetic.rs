@@ -2,7 +2,6 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::cmp::{max, min, Ordering};
 use std::collections::{HashMap, HashSet};
-use std::env::args;
 use std::fs::File;
 use std::io::Write;
 

@@ -1,13 +1,11 @@
 mod genetic;
 mod manager;
 
-use csv::ReaderBuilder;
 use genetic::GeneticSolver;
 use manager::PackageManager;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use std::fs::File;
-use std::{collections::HashMap, thread, time};
+use std::{thread, time};
 
 use genetic::Package;
 use genetic::ULD;
@@ -16,18 +14,7 @@ use genetic::ULD;
 pub struct Request {
     packages: Vec<Package>,
     ulds: Vec<ULD>,
-    mock: bool, //TODO: initialize this field with true
-}
-
-impl Request {
-    pub fn new(packages: Vec<Package>, ulds: Vec<ULD>) -> Request {
-        let mock = true;
-        Request {
-            packages,
-            ulds,
-            mock,
-        }
-    }
+    mock: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -37,31 +24,38 @@ pub struct Solution {
     alloted: Vec<Package>,
 }
 
-pub fn get_cached_solution() -> Vec<HashMap<String, String>> {
-    let file = File::open("sample_solution.csv").expect("Unable to open file");
-    let mut rdr = ReaderBuilder::new().has_headers(true).from_reader(file);
-
-    let mut result = Vec::new();
-    for record in rdr.records() {
-        let record = record.expect("Unable to read record");
-        let mut record_map = HashMap::new();
-        for (i, field) in record.iter().enumerate() {
-            record_map.insert(format!("column_{}", i), field.to_string());
-        }
-        result.push(record_map);
-    }
-    result
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
+pub struct SolutionRow {
+    pack_id: String,
+    uld_id: String,
+    x1: i32,
+    x2: i32,
+    y1: i32,
+    y2: i32,
+    z1: i32,
+    z2: i32,
 }
 
-pub fn generate_solution(req: Request) -> Vec<String> {
-    if req.mock {
+pub fn get_cached_solution() -> Vec<SolutionRow> {
+    let data = std::fs::read_to_string("./sample_solution.csv").expect("Unable to read file");
+    let mut rdr = csv::Reader::from_reader(data.as_bytes());
+    let mut iter = rdr.deserialize();
+
+    let mut parsed_rows: Vec<SolutionRow> = Vec::new();
+    while let Some(result) = iter.next() {
+        let record: SolutionRow = result.expect("Unable to parse record");
+        parsed_rows.push(record);
+    }
+
+    parsed_rows
+}
+
+pub fn generate_solution(req: Request) -> Vec<SolutionRow> {
+    if req.mock.unwrap_or(true) {
         let delay = rand::thread_rng().gen_range(0.2..1.5);
         thread::sleep(time::Duration::from_secs_f64(delay));
 
-        return get_cached_solution()
-            .into_iter()
-            .map(|record| serde_json::to_string(&record).expect("Unable to serialize record"))
-            .collect();
+        return get_cached_solution();
     }
 
     let mut solver = GeneticSolver::new(req.packages.clone(), req.ulds.clone(), 2, 500, 1, 0.8);
@@ -75,5 +69,7 @@ pub fn generate_solution(req: Request) -> Vec<String> {
         base_solution.alloted,
     );
 
-    mng.get_results()
+    // TODO: Use manager to get the results
+    // mng.get_results()
+    Vec::new()
 }

@@ -38,12 +38,12 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .wrap(Logger::default())
-            .wrap(Cors::permissive()) // Allow all origins and methods
+            .wrap(Cors::permissive())
             .service(health_check)
             .service(get_solution)
             .service(get_metrics)
     })
-    .bind("0.0.0.0:8080")?
+    .bind("0.0.0.0:8000")?
     .run()
     .await
 }
