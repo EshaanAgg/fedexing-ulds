@@ -41,7 +41,6 @@ def get_cached_solution():
 
 def generate_solution(req: Request):
     if req.mock:
-        # Add a random delay of 0.2 to 1.5 seconds to simulate a long running task
         time.sleep(random.uniform(0.2, 1.5))
         return get_cached_solution()
 

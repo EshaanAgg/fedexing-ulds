@@ -750,7 +750,6 @@ class Config:
             header=False,
         )
 
-
 class GeneticSolver:
     def __init__(
         self,
@@ -834,3 +833,4 @@ class GeneticSolver:
                 population[0].store(gen)
 
         return population[0].resultant_data
+    

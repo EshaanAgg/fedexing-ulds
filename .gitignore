@@ -20,3 +20,6 @@ __pycache__
 *.rar
 
 app/target/
+server/sample_solution.csv
+rust_server/target/
+rust_server/Cargo.lock
