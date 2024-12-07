@@ -1104,9 +1104,23 @@ impl GeneticSolver {
 
         // Return the resultant data from the best configuration
         let best_config = &population[0];
+        let uld_order: Vec<String> = best_config
+            .all_ulds
+            .iter()
+            .map(|uld| uld.id.clone())
+            .collect();
+        let pack_order: Vec<String> = best_config
+            .all_pkgs
+            .iter()
+            .map(|pkg| pkg.id.clone())
+            .collect();
+
+        let uld_order: Vec<usize> = uld_order.iter().map(|s| s.parse().unwrap()).collect();
+        let pack_order: Vec<usize> = pack_order.iter().map(|s| s.parse().unwrap()).collect();
+
         Solution {
-            uld_order: best_config.priority_order.clone(),
-            pack_order: best_config.non_priority_order.clone(),
+            uld_order,
+            pack_order,
             alloted: best_config.all_pkgs.clone(),
         }
     }
