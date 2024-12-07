@@ -121,7 +121,14 @@ pub fn moi_metric(req: &Request) -> f64 {
         return 0.0;
     }
 
-    (moi_corners.iter().copied().sum::<f64>() / 4.0 + moi_corners.iter().copied().map(|x| (x - moi_corners.iter().copied().sum::<f64>() / 4.0).powi(2)).sum::<f64>().sqrt()) / moi_min
+    (moi_corners.iter().copied().sum::<f64>() / 4.0
+        + moi_corners
+            .iter()
+            .copied()
+            .map(|x| (x - moi_corners.iter().copied().sum::<f64>() / 4.0).powi(2))
+            .sum::<f64>()
+            .sqrt())
+        / moi_min
 }
 
 pub fn used_space(req: &Request) -> f64 {
@@ -161,19 +168,32 @@ pub fn stability(req: &Request) -> f64 {
         );
         base_support_area += pkg.length() * pkg.width() / mx_base_area;
 
-        center_of_gravity_height += ((pkg.z1 + pkg.z2) / 2.0 / req.uld_height) * (pkg.weight / total_weight);
+        center_of_gravity_height +=
+            ((pkg.z1 + pkg.z2) / 2.0 / req.uld_height) * (pkg.weight / total_weight);
 
         weighted_x_sum += pkg.center().x * pkg.weight;
         weighted_y_sum += pkg.center().y * pkg.weight;
     }
 
     for pkg in &req.packages {
-        let below_packages: Vec<_> = req.packages.iter().filter(|other| {
-            other.x1 < pkg.x2 && other.x2 > pkg.x1 && other.y1 < pkg.y2 && other.y2 > pkg.y1 && other.z2 <= pkg.z1
-        }).collect();
+        let below_packages: Vec<_> = req
+            .packages
+            .iter()
+            .filter(|other| {
+                other.x1 < pkg.x2
+                    && other.x2 > pkg.x1
+                    && other.y1 < pkg.y2
+                    && other.y2 > pkg.y1
+                    && other.z2 <= pkg.z1
+            })
+            .collect();
 
         let stacked_weight: f64 = below_packages.iter().map(|other| other.weight).sum();
-        stacking_stability += if stacked_weight >= pkg.weight { 1.0 } else { 0.0 };
+        stacking_stability += if stacked_weight >= pkg.weight {
+            1.0
+        } else {
+            0.0
+        };
     }
 
     base_support_area /= req.packages.len() as f64;
@@ -181,12 +201,23 @@ pub fn stability(req: &Request) -> f64 {
 
     let center_x = weighted_x_sum / total_weight;
     let center_y = weighted_y_sum / total_weight;
-    let deviation_from_center = ((center_x - req.uld_length / 2.0).powi(2) + (center_y - req.uld_width / 2.0).powi(2)).sqrt();
-    let placement_distribution = 1.0 - (deviation_from_center / ((req.uld_length + req.uld_width) / 4.0));
+    let deviation_from_center = ((center_x - req.uld_length / 2.0).powi(2)
+        + (center_y - req.uld_width / 2.0).powi(2))
+    .sqrt();
+    let placement_distribution =
+        1.0 - (deviation_from_center / ((req.uld_length + req.uld_width) / 4.0));
 
     0.2 * base_support_area
         + 0.2 * (1.0 - center_of_gravity_height)
         + 0.5 * placement_distribution
         + 0.1 * stacking_stability
         + 0.08
+}
+
+pub fn pack_volume(request: &Request) -> f64 {
+    if request.uld_height == 0.0 || request.uld_width == 0.0 || request.uld_length == 0.0 {
+        return 0.0;
+    }
+    0.5 * (request.uld_length * request.uld_width * request.uld_height
+        - request.packages.iter().map(|pkg| pkg.volume()).sum::<f64>())
 }

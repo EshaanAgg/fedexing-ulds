@@ -5,7 +5,7 @@ use actix_cors::Cors;
 use actix_web::{middleware::Logger, web, App, HttpResponse, HttpServer};
 
 use metrics_handler::Request as MetricsRequest;
-use metrics_handler::{moi_metric, stability, used_space, used_weight};
+use metrics_handler::{moi_metric, pack_volume, stability, used_space, used_weight};
 use serde_json::json;
 use solution::generate_solution;
 use solution::Request as SolutionRequest;
@@ -29,6 +29,7 @@ async fn get_metrics(request: web::Json<MetricsRequest>) -> HttpResponse {
         "utilization": used_space(&request),
         "weight_utilization": used_weight(&request),
         "stability": stability(&request),
+        "pack_volume": pack_volume(&request),
     });
     HttpResponse::Ok().json(response)
 }

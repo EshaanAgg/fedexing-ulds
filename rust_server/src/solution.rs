@@ -2,11 +2,13 @@
 
 mod genetic;
 mod manager;
+mod space_compute;
 
 use genetic::GeneticSolver;
 use manager::PackageManager;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+use space_compute::compute_space;
 use std::{thread, time};
 
 use genetic::Package;
@@ -71,5 +73,6 @@ pub fn generate_solution(req: Request) -> Vec<SolutionRow> {
         base_solution.alloted,
     );
 
+    compute_space("./data/solution.csv", "./data/soln_for_viz.csv");
     mng.get_results()
 }
