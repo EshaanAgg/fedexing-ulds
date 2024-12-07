@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 use super::genetic::Package;
+use super::{Solution, SolutionRow};
 
 #[derive(Debug)]
 pub struct PackageManager {
@@ -38,7 +39,14 @@ impl PackageManager {
             .into_iter()
             .map(|p| {
                 (
-                    p.id.parse::<usize>().unwrap(), p.length as usize, p.length as f64, p.width as f64, p.height as f64, p.weight as f64, 0.0, 0.0,
+                    p.id.parse::<usize>().unwrap(),
+                    p.length as usize,
+                    p.length as f64,
+                    p.width as f64,
+                    p.height as f64,
+                    p.weight as f64,
+                    0.0,
+                    0.0,
                 )
             }) // Assuming Package struct has these fields
             .collect();
@@ -200,8 +208,25 @@ impl PackageManager {
         }
     }
 
-    pub fn get_results(&mut self) -> Vec<String> {
+    pub fn get_results(&mut self) -> Vec<SolutionRow> {
         self.topo_sort();
-        self.final_order.clone()
+        self.final_order
+            .iter()
+            .map(|pid_str| {
+                let pid = pid_str.parse::<usize>().unwrap();
+                let package_data = self.package_wise_data[pid].unwrap();
+
+                SolutionRow {
+                    pack_id: pid_str.clone(),
+                    uld_id: package_data.1.to_string(),
+                    x1: package_data.2 as i32,
+                    x2: package_data.5 as i32,
+                    y1: package_data.3 as i32,
+                    y2: package_data.6 as i32,
+                    z1: package_data.4 as i32,
+                    z2: package_data.7 as i32,
+                }
+            })
+            .collect()
     }
 }
