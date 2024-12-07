@@ -27,6 +27,11 @@ This project aims to solve the complex problem of optimizing the packing of pack
 
 - **Web-Based Dashboard**: A visually rich interface for input, real-time visualization, and export options for your optimized loading plans.
 
+### 6. **Performance and Scalability**
+
+- **Rust Implementation**: A high-performance Rust-based server for faster computation and scalability, ensuring quick and efficient packing solutions.
+- **Dockerized Deployment**: Easy deployment using Docker containers for both Python and Rust servers, ensuring portability and ease of use.
+
 ## Project Structure
 
 The project consists of three main folders:
@@ -43,9 +48,8 @@ You need to run the frontend from the [viz](viz) folder, and the backend from ei
 
 Ensure that you have the following installed on your system:
 
-- Docker (for running rust_server)
+- Docker (for running the Rust as well as the Python server)
 - `Node.js` and `npm` (for running the frontend)
-- Python (for running the Python server)
 
 ### Running the Rust Server
 
@@ -69,37 +73,7 @@ To run the `rust_server`, follow these steps:
    docker run -p 8000:8000 rust_server
    ```
 
-   The server will be accessible at `http://localhost:8000`.
-
-### Running the Visualization (viz)
-
-To run the front-end visualization:
-
-1. Navigate to the `viz` folder:
-
-   ```bash
-   cd viz
-   ```
-
-2. Install the required dependencies:
-
-   ```bash
-   npm install
-   ```
-
-3. Rename `sample.env` to `.env`:
-
-   ```bash
-   mv sample.env .env
-   ```
-
-4. Start the development server:
-
-   ```bash
-   npm run dev
-   ```
-
-   The visualization will be available at `http://localhost:3000`.
+The server will be accessible at `http://localhost:8000`.
 
 ### Running the Python Server
 
@@ -125,3 +99,39 @@ To run the Python server, follow these steps:
 
 The server will be accessible at `http://localhost:8000`.
 
+### Running the Visualization (viz)
+
+To run the front-end visualization:
+
+1. Navigate to the `viz` folder:
+
+   ```bash
+   cd viz
+   ```
+
+2. Install the required dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Rename `sample.env` to `.env`:
+
+   ```bash
+   cp sample.env .env
+   ```
+
+4. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+The visualization will be available at `http://localhost:3000`.
+
+## Solutions
+
+There are two files in the solution folder:
+
+1. `solution.txt`: Contains the final solution for evaluation.
+2. `packing_order.txt`: Suggests an efficient order in which the packages should be loaded on the ULDs.
