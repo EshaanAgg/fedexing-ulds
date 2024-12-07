@@ -101,10 +101,25 @@ To run the front-end visualization:
 
 ### Running the Python Server
 
-To run the Python server, simply use:
+To run the Python server, follow these steps:
 
-```bash
-make start
-```
+1. Navigate to the `python_server` folder:
 
-This will start the Python server with the necessary configurations.
+   ```bash
+   cd python_server
+   ```
+
+2. Build the Docker image:
+
+   ```bash
+   docker build -t python_server .
+   ```
+
+3. Run the Docker container:
+
+   ```bash
+   docker run -p 8000:8000 python_server
+   ```
+
+The server will be accessible at `http://localhost:8000`.
+
