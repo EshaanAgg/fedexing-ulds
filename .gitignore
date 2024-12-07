@@ -21,5 +21,6 @@ __pycache__
 
 app/target/
 server/sample_solution.csv
+rust_server/sample_solution.csv
 rust_server/target/
 rust_server/Cargo.lock
