@@ -114,7 +114,7 @@ function Arena() {
 
   return (
     <div style={{ width: '100vw', height: '90vh' }}>
-      <Canvas shadows camera={{ position: [0, 8, 18], fov: 60 }}>
+      <Canvas shadows camera={{ position: [0, 8, 16.5], fov: 60 }}>
         <KeyboardControls
           map={[
             { name: 'forward', keys: ['ArrowUp', 'w', 'W'] },
