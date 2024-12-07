@@ -114,6 +114,16 @@ def used_space(req: Request) -> float:
     )
 
 
+def pack_volume(req: Request) -> float:
+    if req.uld_height == 0 or req.uld_width == 0 or req.uld_length == 0:
+        return 0
+
+    return 0.5 * (
+        req.uld_length * req.uld_width * req.uld_height
+        - sum(pkg.volume for pkg in req.packages)
+    )
+
+
 def used_weight(req: Request) -> float:
     if req.uld_weight == 0:
         return 0

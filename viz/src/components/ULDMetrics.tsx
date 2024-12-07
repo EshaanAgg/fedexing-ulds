@@ -25,6 +25,7 @@ interface Metrics {
   utilization: number;
   weight_utilization: number;
   stability: number;
+  pack_volume: number;
 }
 
 const ULDMetrics = (props: ULD) => {
@@ -38,6 +39,7 @@ const ULDMetrics = (props: ULD) => {
           utilization: 0,
           weight_utilization: 0,
           stability: 0,
+          pack_volume: 0,
         };
 
       const response = await axios.post<Metrics>(
@@ -75,6 +77,10 @@ const ULDMetrics = (props: ULD) => {
     {
       label: 'Physical Stability',
       val: data?.stability.toFixed(3),
+    },
+    {
+      label: 'Packing Material Needed',
+      val: `${((data?.pack_volume ?? 0) / Math.pow(10, 6)).toFixed(3)} m³`,
     },
   ];
 

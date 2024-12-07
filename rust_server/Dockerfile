@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 as builder
+FROM ubuntu:22.04 AS builder
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y libssl-dev build-essential curl
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
@@ -6,9 +6,9 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /usr/src/app
 
-COPY rust_server/Cargo.toml ./
-COPY rust_server/src ./src
-COPY rust_server/sample_solution.csv ./sample_solution.csv
+COPY Cargo.toml ./
+COPY src ./src
+COPY sample_solution.csv ./sample_solution.csv
 
 RUN cargo build --release
 
