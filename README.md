@@ -35,6 +35,8 @@ The project consists of three main folders:
 - **rust_server**: A Rust-based server, written later for better performance and speed, offering the same solution as `python_server`.
 - **viz**: The front-end visualization part of the project, used for presenting the optimized packing plans.
 
+You need to run the frontend from the [viz](viz) folder, and the backend from either the [python_server](python_server) or [rust_server](rust_server) folder, based on what you prefer.
+
 ## Getting Started
 
 ### Prerequisites
@@ -42,8 +44,8 @@ The project consists of three main folders:
 Ensure that you have the following installed on your system:
 
 - Docker (for running rust_server)
-- Node.js and npm (for running viz)
-- Python and dependencies (for running python_server)
+- `Node.js` and `npm` (for running the frontend)
+- Python (for running the Python server)
 
 ### Running the Rust Server
 
@@ -101,10 +103,16 @@ To run the front-end visualization:
 
 ### Running the Python Server
 
-To run the Python server, simply use:
+To run the Python server, you need to naivagte to the `python_server` folder and then create a new virtual environment and install the required dependencies.
+
+You can follow these steps:
 
 ```bash
-make start
+cd python_server
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+hypercorn main:app
 ```
 
-This will start the Python server with the necessary configurations.
+The server will be accessible at `http://localhost:8000`.
