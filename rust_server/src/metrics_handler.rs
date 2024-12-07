@@ -1,3 +1,5 @@
+#![allow(warnings, unused)]
+
 use serde::Deserialize;
 
 #[derive(Debug, Clone)]

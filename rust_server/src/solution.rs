@@ -1,3 +1,5 @@
+#![allow(warnings, unused)]
+
 mod genetic;
 mod manager;
 
@@ -69,7 +71,5 @@ pub fn generate_solution(req: Request) -> Vec<SolutionRow> {
         base_solution.alloted,
     );
 
-    // TODO: Use manager to get the results
-    // mng.get_results()
-    Vec::new()
+    mng.get_results()
 }
