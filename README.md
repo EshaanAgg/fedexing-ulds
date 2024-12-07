@@ -103,16 +103,25 @@ To run the front-end visualization:
 
 ### Running the Python Server
 
-To run the Python server, you need to naivagte to the `python_server` folder and then create a new virtual environment and install the required dependencies.
+To run the Python server, follow these steps:
 
-You can follow these steps:
+1. Navigate to the `python_server` folder:
 
-```bash
-cd python_server
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-hypercorn main:app
-```
+   ```bash
+   cd python_server
+   ```
+
+2. Build the Docker image:
+
+   ```bash
+   docker build -t python_server .
+   ```
+
+3. Run the Docker container:
+
+   ```bash
+   docker run -p 8000:8000 python_server
+   ```
 
 The server will be accessible at `http://localhost:8000`.
+
