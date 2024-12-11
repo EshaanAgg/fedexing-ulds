@@ -27,5 +27,4 @@ rust_server/Cargo.lock
 
 */database.db
 */database.db-journal
-
-./*/data/*/.csv
+/*/data/*/*.csv

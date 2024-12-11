@@ -1,8 +1,8 @@
 import threading
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
+from sqlmodel import SQLModel
+from fastapi.middleware.cors import CORSMiddleware
 
 from solution import generate_solution, Request as SolutionRequest
 from metrics_handler import (
@@ -23,6 +23,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+def on_startup():
+    """Ensure database tables are created on startup."""
+    with DatabaseHandler() as db:
+        SQLModel.metadata.create_all(db.engine)
 
 
 @app.get("/")
@@ -58,17 +65,27 @@ def get_solution(request: SolutionRequest):
 @app.get("/api/requests")
 def get_requests():
     with DatabaseHandler() as db:
-        return db.get_all_requests()
+        requests = db.get_all_requests()
+        return [
+            {"id": req.id, "timestamp": req.timestamp, "status": req.status}
+            for req in requests
+        ]
 
 
-class Post_API_Request(BaseModel):
+class PostAPIRequest(BaseModel):
     id: int
 
 
 @app.post("/api/request")
-def get_request_result(request: Post_API_Request):
+def get_request_result(request: PostAPIRequest):
     with DatabaseHandler() as db:
-        return db.get_reponse(request.id)
+        response = db.get_response(request.id)
+        if response is None:
+            raise HTTPException(
+                status_code=301,
+                detail="There is no item with the provided ID or the request is still being processed.",
+            )
+        return response
 
 
 @app.post("/api/metrics")

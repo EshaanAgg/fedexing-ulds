@@ -1,66 +1,45 @@
-import os
 import pickle
-import sqlite3
-import threading
+from typing import Optional
 from datetime import datetime
+from sqlmodel import Field, Session, SQLModel, create_engine, select
+
+
+# SQLModel Request table
+class Request(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    hash: str = Field(unique=True)
+    content: Optional[bytes] = None
+    timestamp: str
+    status: str
 
 
 class DatabaseHandler:
-    def __init__(self, db_name="./database.db"):
-        self.db_name = db_name
-        self.lock = threading.Lock()
-        self.conn = None
-        self.cursor = None
+    def __init__(self, db_url="sqlite:///./database.db"):
+        self.engine = create_engine(db_url, echo=False)
+        SQLModel.metadata.create_all(self.engine)
 
     def __enter__(self):
         """
-        Initializes the database connection and returns the instance.
+        Initializes the database session and returns the instance.
         """
-        self.lock.acquire()
-        self.conn = sqlite3.connect(self.db_name, check_same_thread=False)
-        self.cursor = self.conn.cursor()
-
-        # Initialize the database if it's the first time.
-        if not os.path.exists(self.db_name):
-            self._initialize_database()
-
+        self.session = Session(self.engine)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """
-        Ensures the connection is properly closed and the lock is released.
+        Ensures the session is properly closed.
         """
-        if self.conn:
-            self.conn.commit()
-            self.conn.close()
-        self.lock.release()
+        self.session.close()
 
-    def _initialize_database(self):
-        """
-        Initializes the database tables.
-        """
-        self.cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS requests (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                hash TEXT UNIQUE,
-                content BLOB,
-                timestamp TEXT,
-                status TEXT
-            )
-            """
-        )
-        self.conn.commit()
-
-    def get_request(self, hash):
+    def get_request(self, hash: str):
         """
         Returns the request with the given hash if it exists.
         """
-        self.cursor.execute("SELECT content FROM requests WHERE hash = ?", (hash,))
-        result = self.cursor.fetchone()
+        statement = select(Request).where(Request.hash == hash)
+        result = self.session.exec(statement).first()
 
         if result:
-            return True, pickle.loads(result[0])
+            return True, pickle.loads(result.content) if result.content else None
 
         return False, None
 
@@ -68,41 +47,46 @@ class DatabaseHandler:
         """
         Returns all requests with their status.
         """
-        self.cursor.execute("SELECT id, timestamp, status FROM requests")
-        return self.cursor.fetchall()
+        statement = select(Request.id, Request.timestamp, Request.status)
+        results = self.session.exec(statement).all()
+        return results
 
-    def add_new_request(self, hash):
+    def add_new_request(self, hash: str):
         """
         Adds a new request to the database and returns the ID of the request.
         """
-        res = self.cursor.execute(
-            "INSERT INTO requests (hash, content, timestamp, status) VALUES (?, ?, ?, ?) RETURNING id",
-            (hash, pickle.dumps(None), datetime.now().isoformat(), "PENDING"),
+        new_request = Request(
+            hash=hash,
+            content=None,
+            timestamp=datetime.now().isoformat(),
+            status="PENDING",
         )
-        self.conn.commit()
-        request_id = res.fetchone()[0]
-        return request_id
+        self.session.add(new_request)
+        self.session.commit()
+        self.session.refresh(new_request)
+        return new_request.id
 
-    def update_request_result(self, request_id, result):
+    def update_request_result(self, request_id: int, result):
         """
         Updates the request with the given ID with the result.
         """
-        self.cursor.execute(
-            "UPDATE requests SET content = ?, status = ? WHERE id = ?",
-            (pickle.dumps(result), "COMPLETED", request_id),
-        )
-        self.conn.commit()
+        statement = select(Request).where(Request.id == request_id)
+        request = self.session.exec(statement).first()
 
-    def get_response(self, request_id):
+        if request:
+            request.content = pickle.dumps(result)
+            request.status = "COMPLETED"
+            self.session.add(request)
+            self.session.commit()
+
+    def get_response(self, request_id: int):
         """
         Returns the response for a completed request.
         """
-        self.cursor.execute(
-            "SELECT content, status FROM requests WHERE id = ?", (request_id,)
-        )
-        result = self.cursor.fetchone()
+        statement = select(Request).where(Request.id == request_id)
+        request = self.session.exec(statement).first()
 
-        if not result or result[1] != "COMPLETED":
+        if not request or request.status != "COMPLETED":
             return None
 
-        return pickle.loads(result[0])
+        return pickle.loads(request.content) if request.content else None
