@@ -1,9 +1,8 @@
-import time
-import random
+import os
 import pandas as pd
 from pydantic import BaseModel, computed_field
-from core.genetic import GeneticSolver
-from core.manager import PackageManager
+
+from database import DatabaseHandler
 
 
 class Package(BaseModel):
@@ -34,25 +33,24 @@ class Request(BaseModel):
     mock: bool = True
 
 
-def get_cached_solution():
-    df = pd.read_csv("./data/sample_solution.csv")
-    return df.to_dict(orient="records")
+def generate_solution(req: Request, request_id: int):
+    packages = pd.DataFrame(req.packages)
+    ulds = pd.DataFrame(req.ulds)
 
+    pck_path = f"./data/{request_id}/packages.csv"
+    uld_path = f"./data/{request_id}/ulds.csv"
+    pack_path = f"./data/{request_id}/solution.csv"
 
-def generate_solution(req: Request):
-    if req.mock:
-        time.sleep(random.uniform(0.2, 1.5))
-        return get_cached_solution()
+    # Create a new directory and sstore the dataframes
+    os.makedirs(f"./data/{request_id}")
+    packages.to_csv(pck_path, index=False)
+    ulds.to_csv(uld_path, index=False)
 
-    solver = GeneticSolver(req.packages, req.ulds)
-    base_solution = solver.run()
+    # Execute the script to generate the solution
+    os.system(f"python ./scripts/generate.py {pck_path} {uld_path} {pack_path}")
 
-    mng = PackageManager(
-        len(req.packages),
-        len(req.ulds),
-        base_solution.uld_order,
-        base_solution.pack_order,
-        base_solution.alloted,
-    )
+    res = pd.read_csv(pack_path).to_dict(orient="records")
+    with DatabaseHandler() as db:
+        db.update_request_result(request_id, res)
 
-    return mng.get_results()
+    return res

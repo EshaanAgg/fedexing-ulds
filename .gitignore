@@ -24,3 +24,8 @@ server/sample_solution.csv
 rust_server/sample_solution.csv
 rust_server/target/
 rust_server/Cargo.lock
+
+*/database.db
+*/database.db-journal
+
+./*/data/*/.csv

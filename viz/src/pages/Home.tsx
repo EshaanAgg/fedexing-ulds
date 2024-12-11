@@ -17,6 +17,8 @@ import { PackageDataSchema, ULDDataSchema } from '../utils/dataConvert';
 import { useProblemDataActions } from '../stores/problemDataStore';
 import type { ULDData, PackageData } from '../utils/dataConvert';
 import { parseCSV } from '../utils/parse';
+import { useDisclosure } from '@mantine/hooks';
+import PastRequests from '../components/PastRequests';
 
 function DropzoneUploadedFile({
   files,
@@ -48,6 +50,10 @@ function Home() {
 
   const [uldFile, setUldFile] = useState<File | null>(null);
   const [packageFile, setPackageFile] = useState<File | null>(null);
+  const [
+    requestDrawerOpened,
+    { open: openRequestDrawer, close: closeRequestDrawer },
+  ] = useDisclosure(false);
 
   const handleFileUpload = (file: File, type: 'uld' | 'package') => {
     switch (type) {
@@ -143,6 +149,12 @@ function Home() {
         >
           Process Files
         </Button>
+
+        {/* Request drawer content */}
+        <Button variant="default" onClick={openRequestDrawer} mt="lg">
+          View Previous Requests
+        </Button>
+        <PastRequests opened={requestDrawerOpened} close={closeRequestDrawer} />
       </Flex>
     </Container>
   );

@@ -27,6 +27,16 @@ import { useNavigate } from 'react-router';
 
 const iconStyle = { width: rem(12), height: rem(12) };
 
+type PackingRespone =
+  | {
+      status: 'processed';
+      result: PackingResult[];
+    }
+  | {
+      status: 'processing';
+      request_id: number;
+    };
+
 function DataReview() {
   const [packageCompFile, setPackageCompFile] = useState<File | null>(null);
   const [uldCompFile, setUldCompFile] = useState<File | null>(null);
@@ -44,22 +54,31 @@ function DataReview() {
         'Please wait for a couple of minutes while we generate the solution for you!',
     });
 
-    const solutionData = await axios.post<PackingResult[]>(
+    const response = await axios.post<PackingRespone>(
       '/api',
       { packages, ulds },
       { baseURL: import.meta.env.VITE_BACKEND_API_URL },
     );
+    const res = response.data;
 
-    setPackingResults(solutionData.data);
-    calculateProcessedUlds();
+    if (res.status === 'processed') {
+      setPackingResults(res.result);
+      calculateProcessedUlds();
 
-    notifications.show({
-      title: 'Solution generated!',
-      color: 'green',
-      message: 'The solution has been generated successfully!',
-    });
-
-    navigate('/arena');
+      notifications.show({
+        title: 'Solution generated!',
+        color: 'green',
+        message: 'The solution has been generated successfully!',
+      });
+      navigate('/arena');
+    } else {
+      notifications.show({
+        title: 'Request submitted successfully!',
+        color: 'yellow',
+        message: `Your request has been submitted with the ID ${res.request_id}. You can access the same from the past requests section on the homepage!`,
+      });
+      navigate('/');
+    }
   };
 
   return (
